@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>胡江 · 前端与 AI 应用 | 个人作品集</title>
+    <meta
+      name="description"
+      content="胡江的个人作品集：物联网工程学生，关注前端体验与 AI 应用。这里记录 ImageGrab 浏览器扩展、大模型训练实验与一些开发笔记。"
+    />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="canonical" href="https://hujiang888.github.io/" />
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://hujiang888.github.io/" />
+    <meta property="og:title" content="胡江 · 前端与 AI 应用" />
+    <meta
+      property="og:description"
+      content="物联网工程学生，关注前端体验与 AI 应用。做过浏览器扩展、大模型训练实验，也把课程作业做成了能上线的产品。"
+    />
+    <meta property="og:image" content="https://hujiang888.github.io/assets/img/og-cover.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "name": "胡江",
+            "alternateName": "Jiang Hu",
+            "url": "https://hujiang888.github.io/",
+            "jobTitle": "物联网工程学生 / 前端与 AI 应用开发",
+            "affiliation": {
+              "@type": "CollegeOrUniversity",
+              "name": "大连民族大学"
+            },
+            "knowsAbout": ["Web Development", "AI Applications", "Browser Extensions"],
+            "sameAs": ["https://github.com/hujiang888"]
+          },
+          {
+            "@type": "WebSite",
+            "name": "胡江 · 个人作品集",
+            "url": "https://hujiang888.github.io/",
+            "inLanguage": "zh-CN"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <svg class="svg-sprite" aria-hidden="true" focusable="false">
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M6 18L18 6M18 6H9M18 6v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="i-github" viewBox="0 0 24 24">
+        <path d="M12 2.2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10 10 0 0012 2.2z" fill="currentColor" />
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect x="8" y="8" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7" />
+        <path d="M16 8V6.5A2.5 2.5 0 0013.5 4h-7A2.5 2.5 0 004 6.5v7A2.5 2.5 0 006.5 16H8" fill="none" stroke="currentColor" stroke-width="1.7" />
+      </symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24">
+        <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7" />
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </symbol>
+    </svg>
+
+    <header class="site-header" id="top">
+      <div class="container header__inner">
+        <a class="brand" href="index.html" aria-label="胡江 · 返回首页">
+          <img class="brand__mark" src="assets/img/logo.svg" alt="" width="38" height="38" />
+          <span class="brand__text"><strong>胡江</strong><span>JIANG HU</span></span>
+        </a>
+
+        <nav class="nav" id="nav" aria-label="主导航">
+          <a class="nav__link" href="#about">关于</a>
+          <a class="nav__link" href="#skills">技能</a>
+          <a class="nav__link" href="#work">项目</a>
+          <a class="nav__link" href="#notes">笔记</a>
+          <a class="nav__link" href="#contact">联系</a>
+          <a class="nav__ext" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">
+            GitHub
+            <svg class="icon"><use href="#i-arrow"></use></svg>
+          </a>
+        </nav>
+
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <svg class="icon icon--menu"><use href="#i-menu"></use></svg>
+          <svg class="icon icon--close"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ===================== HERO ===================== -->
+      <section class="hero" id="home">
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <p class="eyebrow">
+              <span>PORTFOLIO / 2026</span>
+              <span class="eyebrow__line" aria-hidden="true"></span>
+              <span>DALIAN, CN</span>
+            </p>
+
+            <h1 class="hero__title">
+              胡江
+              <span class="hero__en">JIANG HU</span>
+            </h1>
+
+            <p class="hero__role">物联网工程学生 <em>×</em> 前端与 AI 应用</p>
+            <p class="hero__lead">
+              我把课程里的想法，做成能点开、能上线的东西。
+              这里记录我的项目、实验，以及一些还没想明白的问题。
+            </p>
+
+            <div class="hero__actions">
+              <a class="btn btn--accent" href="#work">
+                查看项目
+                <svg class="icon"><use href="#i-arrow"></use></svg>
+              </a>
+              <a class="btn btn--ghost" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">
+                <svg class="icon"><use href="#i-github"></use></svg>
+                GitHub
+              </a>
+            </div>
+
+            <ul class="hero__meta">
+              <li>大连民族大学 · 2024 级</li>
+              <li><span class="dot" aria-hidden="true"></span>开放课程项目与合作</li>
+            </ul>
+          </div>
+
+          <aside class="profile-card" aria-label="个人索引">
+            <div class="profile-card__top">
+              <span>INDEX 01</span>
+              <span>2026</span>
+            </div>
+
+            <div class="profile-card__mark" aria-hidden="true">HJ</div>
+            <p class="profile-card__name">JIANG HU</p>
+            <p class="profile-card__role">IoT · Frontend · AI</p>
+
+            <dl class="profile-card__facts">
+              <div><dt>坐标</dt><dd>大连 · 中国</dd></div>
+              <div><dt>正在做</dt><dd>ImageGrab v1.1</dd></div>
+              <div><dt>最近更新</dt><dd>2026.10.27</dd></div>
+            </dl>
+
+            <span class="profile-card__stamp">OPEN TO<br />COLLABORATE</span>
+            <span class="profile-card__sun" aria-hidden="true">
+              <svg class="icon"><use href="#i-sun"></use></svg>
+            </span>
+          </aside>
+        </div>
+
+        <div class="container hero__foot">
+          <span>SCROLL TO EXPLORE</span>
+          <span>39.0°N · 121.6°E</span>
+        </div>
+      </section>
+
+      <!-- ===================== ABOUT ===================== -->
+      <section class="section section--about" id="about">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-label"><span>01</span> ABOUT</p>
+            <h2>先想清楚，<br />再动手。</h2>
+          </div>
+
+          <div class="about-grid">
+            <div class="about-copy reveal">
+              <p class="lead">
+                我是胡江，大连民族大学物联网工程专业 2024 级本科生。
+              </p>
+              <p>
+                我更喜欢把学习做成作品：先明确问题，拆成能验证的小步骤，再让它真正上线。
+                过去一年，我从 Python、数据结构、单片机，走到 Transformer、SFT / LoRA，
+                也把一个小小的电商图片插件做成了有官网、有版本号的产品。
+              </p>
+              <p>
+                我相信好的技术表达应该清楚、克制、可验证——这也是这个网站想呈现的样子。
+              </p>
+
+              <ul class="values">
+                <li><span>01</span><strong>先跑通，再打磨</strong></li>
+                <li><span>02</span><strong>让界面说人话</strong></li>
+                <li><span>03</span><strong>用测试守住结果</strong></li>
+              </ul>
+            </div>
+
+            <ol class="timeline reveal">
+              <li>
+                <span class="timeline__date">2024.09</span>
+                <div><strong>入学大连民族大学</strong><p>物联网工程专业，开始系统学习编程与硬件基础。</p></div>
+              </li>
+              <li>
+                <span class="timeline__date">2025 — 2026</span>
+                <div><strong>课程项目</strong><p>Python、数据结构、单片机、物联网感知层实验。</p></div>
+              </li>
+              <li>
+                <span class="timeline__date">2026.10</span>
+                <div><strong>大模型训练实践</strong><p>从 BPE、注意力机制，到预训练、SFT 与 LoRA。</p></div>
+              </li>
+              <li class="timeline__now">
+                <span class="timeline__date">NOW</span>
+                <div><strong>ImageGrab v1.1 与个人网站</strong><p>把课程作业继续往前推，做成可以访问、可以更新的作品。</p></div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SKILLS ===================== -->
+      <section class="section section--skills" id="skills">
+        <div class="container">
+          <div class="section-head section-head--row">
+            <div>
+              <p class="section-label"><span>02</span> SKILLS</p>
+              <h2>工具是手段，<br />把事做成才是目的。</h2>
+            </div>
+            <p class="section-head__note">
+              不追求把所有关键词写满。<br />
+              这里只记录真正用过、踩过坑的部分。
+            </p>
+          </div>
+
+          <div class="skill-grid">
+            <article class="skill-card reveal">
+              <div class="skill-card__head">
+                <span class="skill-card__num">01</span>
+                <h3>前端</h3>
+                <span class="skill-card__level">日常使用</span>
+              </div>
+              <p>把布局、动效与可访问性，收进一个清晰的界面里。</p>
+              <ul class="tags">
+                <li>HTML</li><li>CSS</li><li>JavaScript</li><li>响应式</li><li>无障碍</li><li>静态站点</li>
+              </ul>
+            </article>
+
+            <article class="skill-card reveal">
+              <div class="skill-card__head">
+                <span class="skill-card__num">02</span>
+                <h3>编程</h3>
+                <span class="skill-card__level">日常使用</span>
+              </div>
+              <p>用代码把想法跑起来，也用 Git 把过程留下来。</p>
+              <ul class="tags">
+                <li>Python</li><li>PyTorch</li><li>Git</li><li>GitHub</li><li>Linux 基础</li>
+              </ul>
+            </article>
+
+            <article class="skill-card reveal">
+              <div class="skill-card__head">
+                <span class="skill-card__num">03</span>
+                <h3>AI 应用</h3>
+                <span class="skill-card__level">课程实践</span>
+              </div>
+              <p>理解模型如何训练，也关心它如何真正进入产品。</p>
+              <ul class="tags">
+                <li>LLM 基础</li><li>Transformer</li><li>SFT / LoRA</li><li>Prompt</li><li>AI 编程</li>
+              </ul>
+            </article>
+
+            <article class="skill-card reveal">
+              <div class="skill-card__head">
+                <span class="skill-card__num">04</span>
+                <h3>产品</h3>
+                <span class="skill-card__level">持续学习</span>
+              </div>
+              <p>先把需求写清楚，再让 AI 和我一起把它实现。</p>
+              <ul class="tags">
+                <li>需求分析</li><li>PRD</li><li>信息架构</li><li>测试</li><li>文档</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== WORK ===================== -->
+      <section class="section section--work" id="work">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-label"><span>03</span> SELECTED WORK</p>
+            <h2>做过的东西，<br />都留在这里。</h2>
+          </div>
+
+          <article class="project-feature reveal">
+            <a class="project-feature__media" href="projects/imagegrab.html" aria-label="查看 ImageGrab 项目详情">
+              <img
+                src="assets/img/imagegrab-feature.png"
+                alt="ImageGrab 图片画廊界面：商品图网格、勾选与下载"
+                width="1200"
+                height="800"
+                loading="lazy"
+              />
+              <span class="project-feature__badge">FEATURED / 01</span>
+            </a>
+
+            <div class="project-feature__body">
+              <p class="project-kicker">2026 · BROWSER EXTENSION</p>
+              <h3>图提取 <span>ImageGrab</span></h3>
+              <p class="project-desc">
+                在电商详情页一键提取商品图，默认只保留主图、详情图与试穿图，
+                过滤推荐、买家秀与广告，最后批量下载为 PNG。
+              </p>
+
+              <ul class="tags">
+                <li>Manifest V3</li><li>JavaScript</li><li>Canvas</li><li>Playwright</li><li>GitHub Pages</li>
+              </ul>
+
+              <dl class="project-facts">
+                <div><dt>测试样本</dt><dd>19 → 11 张</dd></div>
+                <div><dt>版本</dt><dd>v1.1.0</dd></div>
+                <div><dt>线上</dt><dd>GitHub Pages</dd></div>
+                <div><dt>角色</dt><dd>独立开发</dd></div>
+              </dl>
+
+              <div class="project-links">
+                <a class="link-accent" href="https://hujiang888.github.io/imagegrab/" target="_blank" rel="noreferrer">
+                  线上体验 <svg class="icon"><use href="#i-arrow"></use></svg>
+                </a>
+                <a href="https://github.com/hujiang888/imagegrab" target="_blank" rel="noreferrer">源码</a>
+                <a href="projects/imagegrab.html">项目复盘</a>
+              </div>
+            </div>
+          </article>
+
+          <div class="project-grid">
+            <article class="project-card reveal">
+              <div class="project-card__cover project-cover--llm" aria-hidden="true">
+                <span class="project-cover__index">02</span>
+                <span class="project-cover__word">BPE<br />SFT<br />LoRA</span>
+                <span class="project-cover__note">COURSE LAB / 2026</span>
+              </div>
+              <div class="project-card__body">
+                <p class="project-kicker">2026 · 课程实验</p>
+                <h3>大模型训练实验</h3>
+                <p>从分词器到注意力、预训练、SFT 与 LoRA，把 Transformer 的训练链路完整跑一遍。</p>
+                <ul class="tags"><li>Python</li><li>PyTorch</li><li>Transformer</li></ul>
+                <a class="link-accent" href="posts/llm-training-notes.html">查看实验笔记 <svg class="icon"><use href="#i-arrow"></use></svg></a>
+              </div>
+            </article>
+
+            <article class="project-card reveal">
+              <div class="project-card__cover project-cover--site" aria-hidden="true">
+                <span class="project-cover__index">03</span>
+                <span class="project-cover__word project-cover__word--serif">HJ.</span>
+                <span class="project-cover__note">HTML / CSS / JS</span>
+              </div>
+              <div class="project-card__body">
+                <p class="project-kicker">2026 · 本站</p>
+                <h3>个人作品集</h3>
+                <p>用原生 HTML / CSS / JS 手写的浅色作品集，关注排版、阅读与细节。</p>
+                <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
+                <a class="link-accent" href="https://github.com/hujiang888/hujiang888.github.io" target="_blank" rel="noreferrer">查看源码 <svg class="icon"><use href="#i-arrow"></use></svg></a>
+              </div>
+            </article>
+          </div>
+
+          <p class="work-more reveal">
+            另外还做过：单片机课程实验、物联网感知层实验、数据结构课程设计。
+          </p>
+        </div>
+      </section>
+
+      <!-- ===================== NOTES ===================== -->
+      <section class="section section--notes" id="notes">
+        <div class="container">
+          <div class="section-head section-head--row">
+            <div>
+              <p class="section-label"><span>04</span> NOTES</p>
+              <h2>写作是另一种调试。</h2>
+            </div>
+            <p class="section-head__note">把踩过的坑写下来，<br />下次就能少走一点。</p>
+          </div>
+
+          <div class="post-list">
+            <a class="post-row reveal" href="posts/imagegrab-retrospective.html">
+              <span class="post-row__num">01</span>
+              <div class="post-row__body">
+                <div class="post-row__meta"><span>2026.10.26</span><span>7 MIN</span><span>工程复盘</span></div>
+                <h3>19 张图里只留 11 张：一次相关性过滤的返工</h3>
+                <p>为什么“尺寸过滤”不够，以及我如何用容器、链接和比例判断一张图是不是商品图。</p>
+              </div>
+              <span class="post-row__arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span>
+            </a>
+
+            <a class="post-row reveal" href="posts/git-pages-deploy.html">
+              <span class="post-row__num">02</span>
+              <div class="post-row__body">
+                <div class="post-row__meta"><span>2026.10.26</span><span>8 MIN</span><span>部署</span></div>
+                <h3>从本地仓库到 GitHub Pages：一次完整的发布</h3>
+                <p>提交、推送、开启 Pages、验证域名，以及我在这条链路上踩过的几个坑。</p>
+              </div>
+              <span class="post-row__arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span>
+            </a>
+
+            <a class="post-row reveal" href="posts/llm-training-notes.html">
+              <span class="post-row__num">03</span>
+              <div class="post-row__body">
+                <div class="post-row__meta"><span>2026.10.25</span><span>9 MIN</span><span>学习笔记</span></div>
+                <h3>把大模型训练拆成五步：我的课程实验笔记</h3>
+                <p>从 BPE、注意力到 SFT 与 LoRA，记录一条能跑通的训练链路和几个关键参数。</p>
+              </div>
+              <span class="post-row__arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span>
+            </a>
+          </div>
+
+          <p class="notes-more">持续更新中 · 目前有 3 篇</p>
+        </div>
+      </section>
+
+      <!-- ===================== CONTACT ===================== -->
+      <section class="section section--contact" id="contact">
+        <div class="container contact">
+          <div class="contact__copy reveal">
+            <p class="section-label"><span>05</span> CONTACT</p>
+            <h2>如果你也在做<br />有意思的事。</h2>
+            <p>
+              我目前开放课程项目、前端与 AI 应用方向的交流。
+              最直接的方式是在 GitHub 找到我。
+            </p>
+
+            <div class="contact__actions">
+              <a class="btn btn--accent" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">
+                <svg class="icon"><use href="#i-github"></use></svg>
+                去 GitHub 找我
+              </a>
+              <button class="btn btn--ghost" type="button" data-copy="hujiang888">
+                <svg class="icon"><use href="#i-copy"></use></svg>
+                <span class="copy-label">复制用户名</span>
+              </button>
+            </div>
+
+            <p class="contact__note">回复不一定快，但都会看。</p>
+          </div>
+
+          <div class="contact__cards reveal">
+            <a class="contact-card" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">
+              <span class="contact-card__label">GitHub</span>
+              <strong>@hujiang888</strong>
+              <span class="contact-card__desc">代码、实验与项目</span>
+              <svg class="icon"><use href="#i-arrow"></use></svg>
+            </a>
+            <a class="contact-card" href="https://hujiang888.github.io/imagegrab/" target="_blank" rel="noreferrer">
+              <span class="contact-card__label">LIVE PROJECT</span>
+              <strong>ImageGrab</strong>
+              <span class="contact-card__desc">一个已经上线的浏览器扩展</span>
+              <svg class="icon"><use href="#i-arrow"></use></svg>
+            </a>
+            <div class="contact-card contact-card--static">
+              <span class="contact-card__label">SCHOOL</span>
+              <strong>大连民族大学</strong>
+              <span class="contact-card__desc">物联网工程 · 2024 级</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="assets/img/logo.svg" alt="" width="34" height="34" />
+          <div>
+            <strong>胡江 · JIANG HU</strong>
+            <p>用 HTML / CSS / JavaScript 手写，AI 辅助。</p>
+          </div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> 胡江</span>
+          <span>Last updated 2026.10.27</span>
+          <a href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub <svg class="icon"><use href="#i-arrow"></use></svg></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
