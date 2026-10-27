@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>把大模型训练拆成五步：我的课程实验笔记 · 胡江</title>
+    <meta
+      name="description"
+      content="从 BPE、注意力、预训练到 SFT 与 LoRA：一份大模型训练课程实验笔记，记录每一步在做什么、关键参数和踩过的坑。"
+    />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="canonical" href="https://hujiang888.github.io/posts/llm-training-notes.html" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="把大模型训练拆成五步：我的课程实验笔记" />
+    <meta property="og:description" content="BPE、注意力、预训练、SFT、LoRA：一条能跑通的大模型训练链路，以及几个容易忽略的细节。" />
+    <meta property="og:url" content="https://hujiang888.github.io/posts/llm-training-notes.html" />
+    <meta property="og:image" content="https://hujiang888.github.io/assets/img/og-cover.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="container header__inner">
+        <a class="brand" href="../index.html" aria-label="胡江 · 返回首页">
+          <img class="brand__mark" src="../assets/img/logo.svg" alt="" width="38" height="38" />
+          <span class="brand__text"><strong>胡江</strong><span>JIANG HU</span></span>
+        </a>
+        <nav class="nav" id="nav" aria-label="主导航">
+          <a class="nav__link" href="../index.html">首页</a>
+          <a class="nav__link" href="../index.html#work">项目</a>
+          <a class="nav__link is-active" href="../index.html#notes">笔记</a>
+          <a class="nav__ext" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+          <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+    <main id="main">
+      <header class="article-hero">
+        <div class="container article-hero__inner">
+          <a class="back-link" href="../index.html#notes">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            返回笔记
+          </a>
+          <p class="article-kicker">NOTE 03 · 学习笔记 · 2026.10.25</p>
+          <h1>把大模型训练拆成五步：我的课程实验笔记</h1>
+          <p class="article-deck">
+            一开始我以为“训练大模型”是一件事，真正跑完课程实验才发现，它更像五件相互依赖的事：
+            分词、注意力、预训练、SFT、LoRA。每一步都有独立的坑，也都能单独验证。
+          </p>
+          <div class="article-meta"><span>胡江</span><span>9 MIN READ</span><span>LLM / 课程实验</span></div>
+        </div>
+      </header>
+
+      <div class="container article-layout">
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="article-toc__label">ON THIS PAGE</p>
+          <a href="#bpe">01 · 分词器</a>
+          <a href="#attention">02 · 注意力</a>
+          <a href="#pretrain">03 · 预训练</a>
+          <a href="#sft">04 · SFT</a>
+          <a href="#lora">05 · LoRA</a>
+          <a href="#summary">最后：把每一步跑通</a>
+        </aside>
+
+        <article class="article-body">
+          <h2 id="bpe">01 · 分词器：先把文字变成数字</h2>
+          <p>
+            实验从一个约 6400 词表的 BPE 分词器开始。BPE 的核心很朴素：从字符开始，反复统计相邻字符对，
+            把出现频率最高的一对合并成新的 token，直到达到目标词表大小。
+          </p>
+          <p>
+            我用两套脚本做了对比：一套是工程版，产出 <code>tokenizer.json</code>；另一套是从零手写的最小实现，
+            用来确认自己真的理解合并过程。手写版一开始在边界判断上出错，最后一个字符会丢，修正循环边界后才做到编解码一致。
+          </p>
+          <pre><code># 语料很大时，不要一次性读入
+max_line_num = 10000
+# 先限制样本量，跑通流程，再扩大规模</code></pre>
+          <p>
+            这一步最容易忽略的是 PAD / UNK。分词器没有配置填充位时，取 id 可能返回空值，后面拼 batch 就会报类型错误。
+          </p>
+
+          <h2 id="attention">02 · 注意力：让模型知道该看哪里</h2>
+          <p>
+            缩放点积注意力的公式很短，但实现里有几个细节：QKV 的维度、除以 <code>sqrt(d_k)</code>、
+            因果掩码，以及 softmax 的数值稳定性。手写 naive softmax 时，分数一大就溢出；改用
+            <code>F.softmax</code> 并做缩放后才稳定。
+          </p>
+          <p>
+            因果掩码的作用是防止模型看到未来的 token。我一开始用 0/1 相乘再按行归一化，结果注意力权重算错了；
+            正确做法是先用 <code>tril</code> 生成下三角掩码，把上三角填成负无穷，再做 softmax。
+          </p>
+          <p>
+            课程里还对比了 MHA、MQA、GQA 和 Flash Attention 的思路。它们优化的是同一个问题：
+            在长序列下，怎样减少显存访问与计算量。理解这一点，比记住某个 API 更重要。
+          </p>
+
+          <h2 id="pretrain">03 · 预训练：让模型学会预测下一个词</h2>
+          <p>
+            预训练阶段的目标是 Next Token Prediction：给定前文，预测下一个 token，损失用交叉熵。
+            数据来自课程提供的 jsonl 语料，我把 <code>DATA_PATH</code> 指向实际文件，并先限制读取一万行，
+            避免 1.2G 数据一次性加载导致内存溢出。
+          </p>
+          <p>
+            第一轮只跑 1 个 epoch，确认 loss 能正常下降并保存 <code>pretrain_768.pth</code>。
+            loss 有震荡不一定是代码错，样本难度差异、padding 参与计算都会造成波动；
+            判断标准是整体趋势是否向下，而不是某一步的绝对值。
+          </p>
+          <p>
+            本机没有显卡，CPU 训练很慢。我的策略是缩小模型与数据量先跑通流程，
+            把完整训练放到有显卡的环境；这比在本地死等更有效。
+          </p>
+
+          <h2 id="sft">04 · SFT：教模型按对话格式回答</h2>
+          <p>
+            SFT 的关键不是“再训一遍”，而是构造对话格式与 loss mask。我把数据整理成 ChatML 风格的
+            <code>user / assistant</code> 结构，只对 assistant 的回复计算损失，避免模型把用户问题也背下来。
+          </p>
+          <p>
+            一开始 loss mask 错位，模型只学了回复的后半段，loss 降不下去。核对 assistant 起止位置与标签偏移后，
+            训练才恢复正常。课程实验里，SFT 后的 loss 大约从 2.0 降到 1.7——数字不惊艳，但趋势是对的。
+          </p>
+
+          <h2 id="lora">05 · LoRA：用很小的旁路改动模型</h2>
+          <p>
+            LoRA 的思路是冻结原模型，只在部分线性层旁注入低秩矩阵：<code>A</code> 用高斯初始化，
+            <code>B</code> 初始化为零，训练时只更新这两个小矩阵。课程里取 <code>r=8</code>，
+            单个 LoRA 权重只有几百 KB。
+          </p>
+          <p>
+            我用同一份底座分别训了身份 LoRA 和医疗问答 LoRA。加载时按模块名匹配 <code>lora.</code> 前缀，
+            否则权重不会生效；医疗数据训练轮数过多时，模型开始遗忘旧知识，最后通过减少轮数并按验证集挑选权重解决。
+          </p>
+          <blockquote>
+            小模型的容量有限，微调数据的风格会直接影响输出。数据质量比“多训几轮”更重要。
+          </blockquote>
+
+          <h2 id="summary">最后：把每一步跑通</h2>
+          <p>
+            这次实验最大的收获，不是某一个 loss 数字，而是建立了一条可以复现的链路：
+            分词器 → 注意力 → 预训练 → SFT → LoRA。每一步都能单独测试，也能单独替换。
+          </p>
+          <p>
+            如果重新做一遍，我会更早写单元测试：分词器的编解码一致性、注意力的掩码形状、loss mask 的边界，
+            这些都值得用一个小测试守住。模型训练看起来是“跑起来就行”，真正省时间的却是这些不起眼的检查。
+          </p>
+
+          <p class="article-end">写于 2026 年 10 月，课程实验完成之后。</p>
+
+          <nav class="article-nav" aria-label="文章导航">
+            <a href="git-pages-deploy.html"><span>PREV</span><strong>从本地仓库到 GitHub Pages</strong></a>
+            <a href="../index.html#notes"><span>BACK</span><strong>返回全部笔记</strong></a>
+          </nav>
+        </article>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="../assets/img/logo.svg" alt="" width="34" height="34" />
+          <div><strong>胡江 · JIANG HU</strong><p>用 HTML / CSS / JavaScript 手写，AI 辅助。</p></div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> 胡江</span>
+          <a href="../index.html">返回首页</a>
+          <a href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/post.js"></script>
+  </body>
+</html>

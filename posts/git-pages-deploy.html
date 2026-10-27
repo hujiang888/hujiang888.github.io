@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>从本地仓库到 GitHub Pages：一次完整的发布 · 胡江</title>
+    <meta
+      name="description"
+      content="一次真实的 GitHub Pages 发布记录：Git 提交、创建仓库、推送、开启 Pages、验证域名，以及遇到的中文编码与部署状态问题。"
+    />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="canonical" href="https://hujiang888.github.io/posts/git-pages-deploy.html" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="从本地仓库到 GitHub Pages：一次完整的发布" />
+    <meta property="og:description" content="代码写完之后，发布才是最后一公里。记录一次从 git push 到域名可访问的完整链路。" />
+    <meta property="og:url" content="https://hujiang888.github.io/posts/git-pages-deploy.html" />
+    <meta property="og:image" content="https://hujiang888.github.io/assets/img/og-cover.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="container header__inner">
+        <a class="brand" href="../index.html" aria-label="胡江 · 返回首页">
+          <img class="brand__mark" src="../assets/img/logo.svg" alt="" width="38" height="38" />
+          <span class="brand__text"><strong>胡江</strong><span>JIANG HU</span></span>
+        </a>
+        <nav class="nav" id="nav" aria-label="主导航">
+          <a class="nav__link" href="../index.html">首页</a>
+          <a class="nav__link" href="../index.html#work">项目</a>
+          <a class="nav__link is-active" href="../index.html#notes">笔记</a>
+          <a class="nav__ext" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+          <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+    <main id="main">
+      <header class="article-hero">
+        <div class="container article-hero__inner">
+          <a class="back-link" href="../index.html#notes">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            返回笔记
+          </a>
+          <p class="article-kicker">NOTE 02 · 部署 · 2026.10.26</p>
+          <h1>从本地仓库到 GitHub Pages：一次完整的发布</h1>
+          <p class="article-deck">
+            代码写完之后，发布才是最后一公里。这篇记录 ImageGrab 从 <code>git init</code> 到
+            <code>https://hujiang888.github.io/imagegrab/</code> 真正可访问的过程，以及中间踩过的坑。
+          </p>
+          <div class="article-meta"><span>胡江</span><span>8 MIN READ</span><span>Git / GitHub Pages</span></div>
+        </div>
+      </header>
+
+      <div class="container article-layout">
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="article-toc__label">ON THIS PAGE</p>
+          <a href="#before">发布前先整理仓库</a>
+          <a href="#git">把过程切成提交</a>
+          <a href="#pages">开启 GitHub Pages</a>
+          <a href="#pitfalls">三个真实的坑</a>
+          <a href="#verify">验证，而不是假设</a>
+        </aside>
+
+        <article class="article-body">
+          <h2 id="before">发布前先整理仓库</h2>
+          <p>
+            本地能打开，不等于线上能访问。发布前我做了三件事：确认 <code>index.html</code> 在站点根目录、
+            所有资源使用相对路径、把不需要上线的测试产物写进 <code>.gitignore</code>。
+          </p>
+          <p>
+            对纯静态站来说，这一步尤其重要。GitHub Pages 只负责托管文件，不会帮你修正路径或补上缺失的依赖。
+            一个大小写写错的文件名，在 Windows 上能打开，推到 Linux 构建环境就可能 404。
+          </p>
+
+          <h2 id="git">把过程切成提交</h2>
+          <p>
+            我没有把所有文件塞进一个“init”提交，而是按功能拆分：项目骨架、提取核心、下载逻辑、画廊、测试、官网、发布配置。
+            这样做的直接好处是，出问题时可以只回退某一块，而不是整个项目。
+          </p>
+          <pre><code>git init -b main
+git add .
+git commit -m "feat: 图片提取核心与悬浮按钮"
+git remote add origin https://github.com/hujiang888/imagegrab.git
+git push -u origin main</code></pre>
+          <p>
+            提交信息写清楚“做了什么”，而不是“改了一下”。后者在三天后回看时几乎没有信息量。
+          </p>
+
+          <h2 id="pages">开启 GitHub Pages</h2>
+          <p>
+            仓库创建好之后，Pages 不一定会自动工作。第一次部署时，Actions 里已经有 workflow 在跑，
+            但 Pages 还没有启用，部署任务最终失败。处理方式是先到仓库的 Settings → Pages 把构建来源配置好，
+            再重新触发一次部署。
+          </p>
+          <p>
+            对于放在 <code>docs/</code> 目录的静态站，也可以直接选择“从分支部署”，目录选 <code>/docs</code>。
+            两种方式没有本质优劣：Actions 更灵活，分支部署更少配置。关键是**确认 Pages 的状态**，不要只看代码有没有 push 成功。
+          </p>
+
+          <h2 id="pitfalls">三个真实的坑</h2>
+          <h3>1. 中文被写成了 ???</h3>
+          <p>
+            用 PowerShell 5.1 调用 GitHub API 创建仓库时，中文描述被按错误编码发送，线上显示成了
+            <code>??? ImageGrab</code>。解决方式是改用 UTF-8 字节发送 JSON，并重新 PATCH 仓库描述和 Release 说明。
+            这个问题的教训是：**涉及中文的 API 请求，必须显式指定 UTF-8**。
+          </p>
+
+          <h3>2. 构建成功不等于页面正确</h3>
+          <p>
+            部署状态变绿只能说明文件上传成功，不能说明页面没有 404。ImageGrab 的官网发布后，我又用浏览器实际打开，
+            检查了图片、CSS、下载 ZIP 和移动端宽度。线上验证要看“页面”，不能只看“部署日志”。
+          </p>
+
+          <h3>3. 缓存会骗你</h3>
+          <p>
+            Pages 有 CDN 缓存。修改后短时间内可能仍看到旧页面，尤其是 CSS 和图片。我的做法是：
+            先强制刷新，再用无痕窗口确认；如果仍然不对，再检查构建产物是否真的更新。
+          </p>
+
+          <h2 id="verify">验证，而不是假设</h2>
+          <p>发布完成后，我固定检查这几项：</p>
+          <ul>
+            <li>首页返回 200，HTTPS 正常；</li>
+            <li>CSS、JS、图片、下载文件都能打开；</li>
+            <li>手机宽度下没有横向滚动；</li>
+            <li>控制台没有报错；</li>
+            <li>链接里的域名与仓库设置一致。</li>
+          </ul>
+          <p>
+            对个人项目来说，发布不是“把代码传上去”，而是“别人能稳定地打开它”。
+            这一步做完，项目才算真正完成。
+          </p>
+
+          <p class="article-end">写于 2026 年 10 月，ImageGrab v1.1.0 与个人网站发布之后。</p>
+
+          <nav class="article-nav" aria-label="文章导航">
+            <a href="imagegrab-retrospective.html"><span>PREV</span><strong>19 张图里只留 11 张</strong></a>
+            <a href="llm-training-notes.html"><span>NEXT</span><strong>把大模型训练拆成五步</strong></a>
+          </nav>
+        </article>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="../assets/img/logo.svg" alt="" width="34" height="34" />
+          <div><strong>胡江 · JIANG HU</strong><p>用 HTML / CSS / JavaScript 手写，AI 辅助。</p></div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> 胡江</span>
+          <a href="../index.html">返回首页</a>
+          <a href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/post.js"></script>
+  </body>
+</html>

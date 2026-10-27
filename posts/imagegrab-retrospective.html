@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>19 张图里只留 11 张：一次相关性过滤的返工 · 胡江</title>
+    <meta
+      name="description"
+      content="ImageGrab 开发复盘：为什么只按尺寸过滤不够，以及如何用容器、链接、比例与文案判断一张图是不是商品图。"
+    />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="canonical" href="https://hujiang888.github.io/posts/imagegrab-retrospective.html" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="19 张图里只留 11 张：一次相关性过滤的返工" />
+    <meta property="og:description" content="只按尺寸过滤是不够的。记录 ImageGrab 从“图片很杂”到“默认只留商品图”的返工过程。" />
+    <meta property="og:url" content="https://hujiang888.github.io/posts/imagegrab-retrospective.html" />
+    <meta property="og:image" content="https://hujiang888.github.io/assets/img/og-cover.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="container header__inner">
+        <a class="brand" href="../index.html" aria-label="胡江 · 返回首页">
+          <img class="brand__mark" src="../assets/img/logo.svg" alt="" width="38" height="38" />
+          <span class="brand__text"><strong>胡江</strong><span>JIANG HU</span></span>
+        </a>
+        <nav class="nav" id="nav" aria-label="主导航">
+          <a class="nav__link" href="../index.html">首页</a>
+          <a class="nav__link" href="../index.html#work">项目</a>
+          <a class="nav__link is-active" href="../index.html#notes">笔记</a>
+          <a class="nav__ext" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+          <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+    <main id="main">
+      <header class="article-hero">
+        <div class="container article-hero__inner">
+          <a class="back-link" href="../index.html#notes">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            返回笔记
+          </a>
+          <p class="article-kicker">NOTE 01 · 工程复盘 · 2026.10.26</p>
+          <h1>19 张图里只留 11 张：一次相关性过滤的返工</h1>
+          <p class="article-deck">
+            “怎么无关的图片也加载进来了？”——这是 ImageGrab 第一版上线后收到的最直接反馈。
+            这篇记录我如何把“尺寸过滤”升级成“相关性过滤”，以及为什么最后保留了“全部”这个出口。
+          </p>
+          <div class="article-meta"><span>胡江</span><span>7 MIN READ</span><span>ImageGrab / 工程复盘</span></div>
+        </div>
+      </header>
+
+      <div class="container article-layout">
+        <aside class="article-toc" aria-label="文章目录">
+          <p class="article-toc__label">ON THIS PAGE</p>
+          <a href="#problem">问题不是图太少</a>
+          <a href="#first">第一版：只看尺寸</a>
+          <a href="#context">把图片放回页面里</a>
+          <a href="#result">结果与取舍</a>
+          <a href="#lesson">留下的一条经验</a>
+        </aside>
+
+        <article class="article-body">
+          <h2 id="problem">问题不是图太少，而是太多</h2>
+          <p>
+            第一版 ImageGrab 的提取逻辑很直接：扫描页面上的 <code>img</code>、<code>srcset</code>、
+            <code>data-src</code> 和背景图，过滤掉小于 100px 的图标，然后把剩下的图片全部塞进画廊。
+            在模拟详情页里，它抓到了 19 张图：商品主图、细节图、推荐商品、买家秀、店铺横幅、优惠券二维码，一个都没落下。
+          </p>
+          <p>
+            对“批量下载”来说，图多似乎是好事。但用户打开画廊的第一反应不是“好全”，而是“怎么这些也进来了”。
+            这说明我解决的是**提取数量**，没有解决**提取意图**。商品图工具的默认结果应该是干净的，而不是让用户先做一次人工筛除。
+          </p>
+
+          <h2 id="first">第一版：只看尺寸，为什么不够</h2>
+          <p>
+            尺寸过滤能解决图标、logo 和占位图，但解决不了“大而无用”的图片。推荐商品的主图同样是 900×900，
+            买家秀同样是高清大图，广告横幅甚至更宽。它们在像素上完全合格，只是在页面语义上不属于当前商品。
+          </p>
+          <p>
+            我一开始想加关键词黑名单，比如文件名里带 <code>banner</code>、<code>ad</code>、<code>avatar</code> 就跳过。
+            但这只能覆盖一部分图片，而且很容易误伤。更可靠的做法，是回到图片所在的页面结构里去看。
+          </p>
+
+          <h2 id="context">把图片放回页面里</h2>
+          <p>
+            我给每张图增加了四类上下文判断，按优先级从高到低：
+          </p>
+          <ol>
+            <li><strong>所在区域</strong>：祖先节点的 class / id 是否包含推荐、评价、广告、店铺装修等特征；如果在页头、页脚、侧栏，也直接排除。</li>
+            <li><strong>链接指向</strong>：图片外层 <code>&lt;a&gt;</code> 是否指向另一个商品详情页。推荐位的图片经常点进去是别的商品，这是很强的信号。</li>
+            <li><strong>图片比例</strong>：过宽或过扁的图通常是横幅；详情区的超长竖图则保留，因为那往往是商品细节长图。</li>
+            <li><strong>替代文本与文件名</strong>：包含“试穿、模特、细节、实拍”等词加分；包含“图标、头像、二维码、推荐”等词减分。</li>
+          </ol>
+          <p>简化后的判断逻辑大致是这样：</p>
+          <pre><code>// 先排除，再判断是否属于商品图
+if (inPageChrome(el)) return other('页面框架');
+if (EXCLUDE_HINTS.test(h)) return other('推荐/评价/广告');
+if (isForeignProductLink(href)) return other('其他商品');
+if (aspect &gt; 3.2 &amp;&amp; !tallDetail) return other('横幅');
+
+if (inGallery) return product('商品主图');
+if (inDetail) return product('详情/试穿');
+if (positiveAlt) return product('商品描述');
+return other('位置不确定');</code></pre>
+          <p>
+            这里没有用任何视觉模型，全部是页面结构规则。它的好处是快、可解释、完全本地；
+            代价是规则需要跟着平台改版维护。对一个课程项目来说，这是合理的取舍。
+          </p>
+
+          <h2 id="result">结果与取舍</h2>
+          <p>
+            在模拟详情页的 19 张候选图里，默认视图现在只保留 11 张：商品主图、细节图、场景图和试穿图。
+            被排除的 8 张是推荐商品、买家秀、广告横幅和优惠券二维码。下载测试也从 11 张商品图全部成功导出为 PNG。
+          </p>
+          <p>
+            但我没有把“其他图片”彻底删掉。画廊顶部保留了「商品图 / 全部」切换：默认干净，
+            需要时仍能查看被过滤的内容并手动下载。因为“相关性”本身有判断误差，直接丢掉可能让用户永远找不回一张想要的图。
+          </p>
+          <blockquote>
+            默认结果应该替用户做决定，但必须留一个可以反悔的出口。
+          </blockquote>
+
+          <h2 id="lesson">留下的一条经验</h2>
+          <p>
+            这次返工让我意识到，过滤功能不是“规则越多越好”，而是**默认值 + 可恢复性**的设计问题。
+            规则负责把 80% 的噪声挡掉，界面负责让剩下的 20% 仍然可被找回。
+          </p>
+          <p>
+            如果你也在做类似的提取工具，建议先准备一个包含真实干扰项的测试页，再写规则。
+            只盯着主图写出来的过滤，通常会在推荐位和买家秀上翻车。
+          </p>
+
+          <p class="article-end">写于 2026 年 10 月，ImageGrab v1.1.0 发布之后。</p>
+
+          <nav class="article-nav" aria-label="文章导航">
+            <a href="git-pages-deploy.html"><span>NEXT</span><strong>从本地仓库到 GitHub Pages</strong></a>
+            <a href="../projects/imagegrab.html"><span>PROJECT</span><strong>ImageGrab 项目详情</strong></a>
+          </nav>
+        </article>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="../assets/img/logo.svg" alt="" width="34" height="34" />
+          <div><strong>胡江 · JIANG HU</strong><p>用 HTML / CSS / JavaScript 手写，AI 辅助。</p></div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> 胡江</span>
+          <a href="../index.html">返回首页</a>
+          <a href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/post.js"></script>
+  </body>
+</html>

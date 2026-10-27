@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图提取 ImageGrab · 项目详情 · 胡江</title>
+    <meta
+      name="description"
+      content="ImageGrab 项目详情：一个默认只保留商品图与试穿图、批量下载 PNG 的 Edge / Chrome 扩展，包含需求、技术方案、问题与结果。"
+    />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="canonical" href="https://hujiang888.github.io/projects/imagegrab.html" />
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="图提取 ImageGrab · 项目详情" />
+    <meta property="og:description" content="电商详情页图片提取、相关性过滤与 PNG 批量下载：从需求到上线的完整项目。" />
+    <meta property="og:url" content="https://hujiang888.github.io/projects/imagegrab.html" />
+    <meta property="og:image" content="https://hujiang888.github.io/assets/img/imagegrab-gallery.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="container header__inner">
+        <a class="brand" href="../index.html" aria-label="胡江 · 返回首页">
+          <img class="brand__mark" src="../assets/img/logo.svg" alt="" width="38" height="38" />
+          <span class="brand__text"><strong>胡江</strong><span>JIANG HU</span></span>
+        </a>
+        <nav class="nav" id="nav" aria-label="主导航">
+          <a class="nav__link" href="../index.html">首页</a>
+          <a class="nav__link is-active" href="../index.html#work">项目</a>
+          <a class="nav__link" href="../index.html#notes">笔记</a>
+          <a class="nav__ext" href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+        <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+          <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+          <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+    <main id="main">
+      <header class="project-hero">
+        <div class="container project-hero__inner">
+          <a class="back-link" href="../index.html#work">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            返回项目
+          </a>
+          <p class="article-kicker">PROJECT 01 · 2026 · BROWSER EXTENSION</p>
+          <h1>图提取 <span>ImageGrab</span></h1>
+          <p class="article-deck">
+            一个默认只保留商品图与试穿图、批量下载为 PNG 的 Edge / Chrome 扩展。
+            从一个课程需求开始，最后做成了有官网、有版本号、有真实发布地址的产品。
+          </p>
+          <div class="article-meta">
+            <span>独立开发</span><span>Manifest V3</span><span>2026.10</span><span>v1.1.0</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="container">
+        <figure class="project-cover">
+          <img src="../assets/img/imagegrab-gallery.png" alt="ImageGrab 画廊：商品图网格、勾选与批量下载" width="1200" height="600" />
+        </figure>
+
+        <div class="project-metrics">
+          <div><span>测试样本</span><strong>19 → 11 张</strong></div>
+          <div><span>PNG 下载</span><strong>11 / 11</strong></div>
+          <div><span>版本</span><strong>v1.1.0</strong></div>
+          <div><span>平台</span><strong>Edge / Chrome</strong></div>
+        </div>
+
+        <div class="article-layout">
+          <aside class="article-toc" aria-label="项目目录">
+            <p class="article-toc__label">ON THIS PAGE</p>
+            <a href="#background">背景</a>
+            <a href="#build">我做了什么</a>
+            <a href="#problems">三个关键问题</a>
+            <a href="#result">结果</a>
+            <a href="#links">链接</a>
+          </aside>
+
+          <article class="article-body">
+            <h2 id="background">背景：把图片“干净地”拿下来</h2>
+            <p>
+              电商详情页的图片分散在主图、缩略图、详情长图、懒加载属性和背景图里。
+              逐张右键保存既慢又容易漏，格式还可能是 JPG、WebP、PNG 混在一起。
+              课程需求是做一个浏览器插件，把这些图片集中展示并批量下载为 PNG。
+            </p>
+            <p>
+              我没有把它停在“能抓图”这一层。第一版上线后，最直接的问题不是抓不到，而是抓得太多：
+              推荐商品、买家秀、店铺横幅、二维码都进了画廊。于是有了 v1.1 的相关性过滤返工。
+            </p>
+
+            <h2 id="build">我做了什么</h2>
+            <ul>
+              <li><strong>扩展端</strong>：Manifest V3 + content script，在淘宝、天猫、京东、拼多多详情页注入悬浮按钮。</li>
+              <li><strong>提取核心</strong>：扫描 <code>img</code>、<code>srcset</code>、<code>data-src</code>、<code>background-image</code>、JSON-LD 与 <code>og:image</code>，补全相对路径并去重。</li>
+              <li><strong>相关性过滤</strong>：结合页面区域、商品链接、图片比例与 alt 文案，默认只保留商品主图、详情图和试穿图。</li>
+              <li><strong>画廊</strong>：网格预览、尺寸筛选、全选 / 反选、单张放大，以及「商品图 / 全部」切换。</li>
+              <li><strong>下载</strong>：OffscreenCanvas 转 PNG，逐张进度与结果反馈，文件名按 <code>商品图_001.png</code> 编号。</li>
+              <li><strong>官网与发布</strong>：静态宣传站、安装说明、GitHub Release、GitHub Pages 部署与线上验证。</li>
+            </ul>
+
+            <h2 id="problems">三个关键问题</h2>
+            <h3>1. 下载一直“失败”，其实文件已经下好了</h3>
+            <p>
+              后台等待下载完成时，把 Chrome 的 <code>in_progress</code> 状态误判成了中断，于是不断重试，
+              一次操作产生多份重复文件。修复方式是只认 <code>complete</code> / <code>interrupted</code>
+              两个终态，中间状态不再触发结束。
+            </p>
+
+            <h3>2. 无关图片也进来了</h3>
+            <p>
+              尺寸过滤只能挡住图标和小图，挡不住同样高清的推荐商品和买家秀。最终方案是把图片放回页面结构里：
+              先排除推荐 / 评价 / 广告区域与指向其他商品的链接，再用图片比例、alt 和所在容器判断相关性。
+              默认只显示商品图，但保留「全部」作为可恢复的出口。
+            </p>
+            <p>
+              详细过程写在 <a href="../posts/imagegrab-retrospective.html">这篇复盘</a>里。
+            </p>
+
+            <h3>3. 发布不是 push 就结束</h3>
+            <p>
+              GitHub Pages 首次部署时，Actions 在跑但 Pages 还没启用，结果部署失败；
+              另外用 PowerShell 写中文仓库简介时出现过 <code>???</code> 编码问题。
+              这些都不是“代码 bug”，但会直接影响项目能不能被访问、被理解。
+              解决后我把检查清单固定下来：状态码、资源、移动端、控制台、下载文件，逐项验证。
+            </p>
+
+            <figure>
+              <img src="../assets/img/imagegrab-fab.png" alt="商品详情页右下角的获取图片悬浮按钮" width="780" height="660" loading="lazy" />
+              <figcaption>详情页右下角的悬浮按钮，不遮挡原有操作；点击后打开独立画廊。</figcaption>
+            </figure>
+
+            <h2 id="result">结果</h2>
+            <p>
+              在包含真实干扰项的模拟详情页里，扫描到 19 张候选图，默认保留 11 张商品图
+              （含一张模特试穿图），过滤 8 张推荐 / 买家秀 / 广告 / 二维码。
+              11 张商品图全部成功转换为 PNG，其中 1800×1800 的大图约 4.7MB。
+            </p>
+            <p>
+              扩展在模拟的 <code>item.jd.com</code> 详情页上完成了真实 manifest 的自动注入测试；
+              线上官网与下载地址均可访问。需要说明的是，真实淘宝 / 京东页面需要登录且存在反爬，
+              本项目没有做真实账号下的完整人工验证，平台改版后也可能需要更新页面规则。
+            </p>
+
+            <h2 id="links">链接</h2>
+            <div class="project-links-box">
+              <a class="btn btn--accent" href="https://hujiang888.github.io/imagegrab/" target="_blank" rel="noreferrer">线上官网</a>
+              <a class="btn btn--ghost" href="https://github.com/hujiang888/imagegrab" target="_blank" rel="noreferrer">GitHub 仓库</a>
+              <a class="btn btn--ghost" href="https://github.com/hujiang888/imagegrab/releases/tag/v1.1.0" target="_blank" rel="noreferrer">v1.1.0 Release</a>
+            </div>
+
+            <p class="article-end">项目周期：2026 年 10 月 · 技术栈：Manifest V3 / JavaScript / Canvas / Playwright / GitHub Pages</p>
+
+            <nav class="article-nav" aria-label="项目导航">
+              <a href="../index.html#work"><span>BACK</span><strong>返回全部项目</strong></a>
+              <a href="../posts/imagegrab-retrospective.html"><span>READ</span><strong>相关性过滤复盘</strong></a>
+            </nav>
+          </article>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="../assets/img/logo.svg" alt="" width="34" height="34" />
+          <div><strong>胡江 · JIANG HU</strong><p>用 HTML / CSS / JavaScript 手写，AI 辅助。</p></div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> 胡江</span>
+          <a href="../index.html">返回首页</a>
+          <a href="https://github.com/hujiang888" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/post.js"></script>
+  </body>
+</html>
