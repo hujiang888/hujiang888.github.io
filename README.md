@@ -1,8 +1,8 @@
-# 胡江 · 个人作品集
+# Jiang Hu · 个人作品集
 
 一个浅色、暖纸感、可持续更新的个人作品集。纯静态 HTML / CSS / JavaScript，无框架、无构建步骤，部署在 GitHub Pages。
 
-![胡江 · 个人作品集](assets/img/og-cover.png)
+![Jiang Hu · 个人作品集](assets/img/og-cover.png?v=2)
 
 - **线上地址**：https://hujiang888.github.io/
 - **GitHub**：https://github.com/hujiang888

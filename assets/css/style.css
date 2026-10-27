@@ -1,5 +1,5 @@
 /* ==========================================================================
-   胡江 · 个人作品集
+   Jiang Hu · 个人作品集
    浅色暖纸 / 编辑感 / 无框架
    ========================================================================== */
 
@@ -711,6 +711,42 @@ code {
   color: var(--muted);
   font-size: 14.5px;
   line-height: 1.95;
+}
+
+.about-now {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.about-now__label {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.about-now ul {
+  display: grid;
+  gap: 8px;
+}
+
+.about-now li {
+  display: flex;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.about-now li span {
+  padding-top: 2px;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  font-size: 8.5px;
 }
 
 .values {
