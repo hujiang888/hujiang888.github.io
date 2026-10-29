@@ -1,392 +1,250 @@
 # Jiang Hu · 个人作品集 技术设计文档
 
-- 文档版本：v2.0
-- 更新日期：2026-10-29
+- 文档版本：v1.0
+- 更新日期：2026-10-27
 - 对应 PRD：`PRD.md`
 - 线上地址：https://hujiang888.github.io/
-- 后台地址：https://hujiang888.github.io/admin/
 
 ## 1. 设计目标
 
-在 GitHub Pages 的静态托管约束下，交付一个**有后台、可改数据、可发布、可追溯**的个人作品集：
+在满足 PRD 的前提下，用尽可能少的运行依赖交付一个**加载快、可维护、可直接部署**的个人作品集：
 
-- 内容与展示分离：内容存 `data/content.json`，前台读取后渲染。
-- 后台可视化编辑：无需改 HTML，登录后修改站点信息、技能、项目、文章。
-- 无独立服务器：用 GitHub 仓库作为内容库，用 Contents API 作为写入接口。
-- 版本可追溯：每次后台保存生成一个 Git commit，可回滚。
-- 保持性能与视觉：不引入框架、构建工具、外部字体与 CDN。
-- 可验证：本地 mock API + 真实 Token 两条链路。
+- 纯静态：HTML + CSS + 原生 JavaScript，无前端框架、无构建步骤。
+- 无后端：项目、文章、个人信息都写在静态页面中。
+- 易部署：GitHub 仓库根目录即站点根目录，推送到 `main` 后由 GitHub Pages 发布。
+- 易维护：一套 CSS 变量控制全站视觉；新增文章只需复制模板并更新列表。
+- 可验证：使用 Playwright 检查响应式、交互、链接与无报错。
 
-## 2. 架构
-
-```text
-┌──────────────────────────────┐
-│ 访客浏览器                    │
-│ index.html / post.html        │
-│  ├─ fetch data/content.json   │
-│  └─ content.js / post-page.js │
-└──────────────┬───────────────┘
-               │ HTTPS
-┌──────────────▼───────────────┐
-│ GitHub Pages（静态托管）       │
-│ HTML / CSS / JS / JSON / 图片 │
-└──────────────▲───────────────┘
-               │ 构建
-┌──────────────┴───────────────┐
-│ GitHub 仓库 main 分支          │
-│ data/content.json + 页面文件   │
-└──────────────▲───────────────┘
-               │ Contents API（读 / 写）
-┌──────────────┴───────────────┐
-│ admin/ 内容后台               │
-│  ├─ GitHub Token 登录         │
-│  ├─ 表单 / JSON 编辑          │
-│  └─ PUT + sha 并发校验        │
-└──────────────────────────────┘
-```
-
-### 2.1 为什么是 Git CMS
-
-GitHub Pages 只提供静态文件，不能运行 Node / PHP / 数据库。可选的路线有三种：
-
-| 路线 | 问题 |
-| --- | --- |
-| 继续纯静态 | 不满足“后台改数据” |
-| 另租服务器 + 数据库 | 需要额外账号、费用、运维；当前没有可用凭据 |
-| Git CMS | 无需服务器，GitHub 即内容库；有登录、CRUD、版本与发布 |
-
-选择 Git CMS 的取舍：
-
-- 优点：零服务器、免费、HTTPS、版本历史、后台改动可审计。
-- 代价：每次保存是一个 commit，发布有 1–2 分钟延迟；写入依赖 GitHub Token；不适合多用户协作编辑。
-- 边界：如果课程硬性要求 Node/Express + MySQL，需要另配服务器与数据库；当前版本不伪装。
-
-### 2.2 技术选型
+## 2. 技术选型
 
 | 层 | 选型 | 理由 |
 | --- | --- | --- |
-| 页面 | 语义化 HTML5 | SEO 与首屏稳定 |
-| 样式 | 原生 CSS + CSS 变量 | 设计 Token 集中管理 |
-| 前台交互 | 原生 JavaScript（ES2020） | 轻量、无构建 |
-| 内容数据 | JSON | 结构清晰，前后台共用 |
-| 后台 | 原生 JS + Fetch | 直接调用 GitHub Contents API |
-| 认证 | GitHub Fine-grained PAT | 最小权限，不新增账号体系 |
-| 富文本 | HTML + DOMParser 白名单清洗 | 保留排版，控制 XSS |
-| 部署 | GitHub Pages | 与仓库自动联动 |
-| 测试 | Playwright（本地 QA） | 多视口、后台 mock、交互检查 |
+| 页面 | 语义化 HTML5 | SEO 友好、无运行时开销 |
+| 样式 | 原生 CSS + CSS 变量 | 设计 Token 集中管理，避免 Tailwind 构建依赖 |
+| 交互 | 原生 JavaScript（ES2020） | 导航、滚动动画、复制、阅读进度足够轻量 |
+| 字体 | 系统中文字体栈 | 无外部字体请求，首屏更快、离线可用 |
+| 图片 | 本地压缩 PNG / SVG | 无 CDN，避免第三方失效 |
+| 部署 | GitHub Pages | 免费、HTTPS、与 GitHub 仓库自动联动 |
+| 测试 | Playwright（仅本地 QA） | 多视口、交互与链接检查 |
+
+### 2.1 为什么不用 React / Vite
+
+本站页面数量少、内容以静态展示为主，没有登录、后台、复杂状态或数据请求。引入 React + Vite 会增加构建产物、依赖升级与部署配置成本，却不会带来明显收益。
+
+如果后续需要文章搜索、标签筛选、后台编辑或评论，再迁移到 Astro / Next.js 等方案；当前 MVP 选择更简单、更可靠的原生静态栈。
 
 ## 3. 项目结构
 
 ```text
 portfolio/
-├── index.html                     # 首页：静态 fallback + content.js 数据渲染
-├── post.html                      # 动态文章页：?slug=...
+├── index.html                     # 首页：Hero / 关于 / 技能 / 项目 / 笔记 / 联系
+├── posts/
+│   ├── imagegrab-retrospective.html
+│   ├── git-pages-deploy.html
+│   └── llm-training-notes.html
 ├── projects/
-│   └── imagegrab.html             # ImageGrab 项目详情（静态案例页）
-├── posts/                         # 旧版静态文章，noindex，保留兼容
-├── admin/
-│   ├── index.html                 # 后台登录 / 工作台
-│   └── admin.css                  # 后台样式
-├── data/
-│   └── content.json               # 唯一内容源
+│   └── imagegrab.html             # ImageGrab 项目详情
 ├── assets/
 │   ├── css/style.css              # 全站样式与设计 Token
-│   ├── js/main.js                 # 导航、滚动、复制、年份
-│   ├── js/content.js              # 首页读取 JSON 并渲染
-│   ├── js/post-page.js            # 动态文章页 + 清洗 + 目录
-│   ├── js/post.js                 # 旧静态文章页交互
-│   ├── js/admin.js                # 后台登录、表单、保存
+│   ├── js/main.js                 # 全站交互
+│   ├── js/post.js                 # 文章页阅读进度
 │   └── img/
+│       ├── logo.svg
+│       ├── favicon.svg
+│       ├── og-cover.png
+│       ├── imagegrab-gallery.png
+│       └── imagegrab-fab.png
 ├── PRD.md
 ├── TECH_DESIGN.md
 ├── AGENTS.md
 ├── README.md
-├── robots.txt
-├── sitemap.xml
-├── 404.html
-└── .nojekyll
+├── .nojekyll
+└── .gitignore
 ```
 
 ## 4. 页面与路由
 
-| 路径 | 内容 | 渲染 |
+站点是「静态多页」而不是单页应用：
+
+| 路径 | 内容 | 渲染方式 |
 | --- | --- | --- |
-| `/` | 首页全部区块 | 静态 HTML 首屏 + `content.js` 按 JSON 更新 |
-| `/post.html?slug=...` | 文章详情 | `post-page.js` 读取 JSON 渲染 |
+| `/` | 首页全部区块 | 静态 HTML |
 | `/projects/imagegrab.html` | 项目详情 | 静态 HTML |
-| `/admin/` | 内容后台 | 登录后由 `admin.js` 渲染表单 |
-| 不存在路径 | 404 | 静态 `404.html` |
+| `/posts/*.html` | 文章详情 | 静态 HTML |
+| 不存在路径 | GitHub Pages 默认 404 | 静态 404（可选） |
 
-首页保留完整静态内容作为 **fallback**：`fetch` 失败、JS 关闭或本地 `file://` 打开时，页面仍然可读。JSON 加载成功后，`content.js` 更新首屏、关于、技能、项目、笔记与联系文案。
+导航锚点：`#about`、`#skills`、`#work`、`#notes`、`#contact`。首页和文章页共享顶部导航与页脚，但文章页使用阅读版式（更窄的内容列、阅读进度、上下篇）。
 
-## 5. 数据模型
+## 5. 样式架构
 
-`data/content.json`：
+### 5.1 Token
 
-```json
-{
-  "meta": { "version": 2, "updatedAt": "2026-10-29" },
-  "profile": {
-    "name": "Jiang Hu",
-    "en": "JIANG HU",
-    "role": "物联网工程学生",
-    "focus": "前端与 AI 应用",
-    "lead": "……",
-    "school": "物联网工程 · 2024 级",
-    "status": "开放课程项目与合作",
-    "location": "大连 · 中国",
-    "doing": "ImageGrab v1.1",
-    "updated": "2026.10.27",
-    "github": "https://github.com/hujiang888",
-    "githubName": "hujiang888"
-  },
-  "about": {
-    "intro": "……",
-    "paragraphs": ["……"],
-    "values": ["先跑通，再打磨"],
-    "now": ["……"],
-    "timeline": [{ "date": "2024.09", "title": "……", "desc": "……" }]
-  },
-  "skills": [
-    { "title": "前端", "level": "日常使用", "desc": "……", "tags": ["HTML"] }
-  ],
-  "projects": [
-    {
-      "slug": "imagegrab",
-      "title": "图提取",
-      "subtitle": "ImageGrab",
-      "kicker": "2026 · BROWSER EXTENSION",
-      "desc": "……",
-      "tags": ["Manifest V3"],
-      "facts": [{ "label": "版本", "value": "v1.1.0" }],
-      "links": { "live": "……", "repo": "……", "detail": "……" },
-      "featured": true,
-      "cover": "assets/img/imagegrab-feature.png",
-      "coverAlt": "……",
-      "coverClass": "project-cover--site",
-      "coverWord": "HJ.",
-      "coverNote": "HTML / CSS / JS"
-    }
-  ],
-  "posts": [
-    {
-      "slug": "imagegrab-retrospective",
-      "title": "……",
-      "date": "2026.10.26",
-      "readTime": "7 MIN",
-      "category": "工程复盘",
-      "excerpt": "……",
-      "content": "<h2 id=\"problem\">……</h2><p>……</p>"
-    }
-  ],
-  "contact": { "intro": "……", "note": "……" }
+所有颜色、间距、字体、圆角、阴影集中在 `:root`：
+
+```css
+:root {
+  --paper: #f6f2e9;
+  --surface: #fffdf8;
+  --ink: #1f211d;
+  --muted: #6f6a5f;
+  --line: #ddd6c7;
+  --accent: #b44a2c;
+  --accent-deep: #4d6453;
+  --highlight: #eadfc9;
+  --serif: "STZhongsong", "Songti SC", "SimSun", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 ```
 
-### 5.1 字段约定
+### 5.2 布局
 
-- `profile.school` 实际承载首屏元信息，不一定真的是学校。
-- `projects` 中第一个 `featured: true` 渲染为首屏精选大卡；其余渲染为卡片。
-- `projects[].links.detail` 可为站内相对路径，也可为空。
-- `posts[].slug` 只允许字母、数字、连字符；后台保存前会校验唯一性。
-- `posts[].content` 是 HTML 字符串，动态页清洗后插入。
-- `about.timeline` 最后一条自动加 `timeline__now` 样式。
-- 所有数组顺序即展示顺序。
+- `.container`：最大宽度 1180px，左右 `clamp(20px, 4vw, 56px)`。
+- 首页区块：编号小标题 + 大字号衬线标题 + 两栏内容。
+- 网格：`repeat(12, 1fr)` 的桌面栅格，移动端降为单列。
+- 文章页：内容列 `min(760px, 100%)`，行高 1.9，适合长文阅读。
 
-## 6. 前台渲染
+### 5.3 响应式断点
 
-### 6.1 首页 `content.js`
+| 断点 | 调整 |
+| --- | --- |
+| ≤ 1024px | 首屏索引卡缩小，项目网格改为两列 |
+| ≤ 768px | 导航折叠为菜单，首屏单列，技能与项目单列 |
+| ≤ 480px | 标题字号进一步缩小，按钮全宽，隐藏装饰性元素 |
 
-1. `fetch('data/content.json?t=...', { cache: 'no-store' })`。
-2. 失败：`console.warn`，保留静态 DOM，不阻塞页面。
-3. 成功：
-   - `renderProfile()`：首屏、索引卡、页脚、页面 title / meta。
-   - `renderAbout()`：段落、原则、NOW、时间线。
-   - `renderSkills()`：按数组重建技能卡。
-   - `renderProjects()`：`featured` 渲染大卡，其余渲染 `project-card`。
-   - `renderNotes()`：文章行，链接到 `post.html?slug=...`。
-   - `renderContact()`：联系文案。
-4. 所有文本经 `esc()` 转义；项目卡片封面字允许 `<br>` 作为设计数据。
+### 5.4 动效
 
-### 6.2 动态文章 `post-page.js`
+- 使用 IntersectionObserver 添加 `.is-visible`，CSS 负责淡入上移。
+- 仅对 `.reveal` 元素生效，避免全站重排。
+- `prefers-reduced-motion: reduce` 时直接显示全部内容。
 
-1. 读取 `?slug=`，加载 JSON，找不到则显示 404 文案。
-2. 更新 `document.title`、description、canonical、OG、BlogPosting JSON-LD。
-3. 正文经过 `sanitize()`：
-   - 允许标签：`h2 h3 p ul ol li strong em blockquote pre code a figure figcaption img br hr`。
-   - 移除 `script/style/iframe/object/embed/form/input/button/...`。
-   - 只保留 `a[href]`、`img[src alt width height loading]`、`h2/h3[id]`。
-   - `href/src` 只允许 http(s)、mailto、相对路径、锚点；拒绝 `javascript:` / `data:`。
-   - 外链自动加 `target="_blank" rel="noreferrer"`。
-4. 从 `h2` 生成目录；缺失 id 自动补 `section-N`。
-5. 阅读进度条 + 目录 IntersectionObserver 高亮。
-6. 上下篇根据数组顺序生成。
+## 6. JavaScript 设计
 
-### 6.3 旧静态文章
+`assets/js/main.js`：
 
-`posts/*.html` 保留兼容，但：
+1. `initNav()`：移动端菜单开关、点击链接关闭、Esc 关闭、滚动锁定。
+2. `initHeader()`：滚动超过 8px 时给导航加 `.is-scrolled`。
+3. `initScrollSpy()`：监听首页区块，更新导航当前项。
+4. `initReveal()`：IntersectionObserver 控制进入视口动画。
+5. `initCopy()`：复制 GitHub 用户名，显示 1.8s 反馈。
+6. `initYear()`：页脚年份自动更新。
 
-- `<meta name="robots" content="noindex, follow">`。
-- canonical 指向 `post.html?slug=...`。
-- 首页不再链接旧页面。
+`assets/js/post.js`（文章页）：
 
-## 7. 后台 `admin.js`
+1. 顶部阅读进度条：按 `scrollY / (documentHeight - viewportHeight)` 计算。
+2. 如果文章有目录（`.post-toc`），点击目录项平滑滚动并更新高亮。
 
-### 7.1 登录
+所有脚本使用 IIFE 与 `'use strict'`，不依赖全局变量；不使用 `innerHTML` 插入用户输入。
 
-```text
-输入 Token
-  → GET https://api.github.com/user       验证身份
-  → GET /repos/{owner}/{repo}/contents/data/content.json
-  → Base64 解码 → JSON.parse
-  → 渲染工作台
-```
+## 7. 内容模型
 
-- Token 存 `sessionStorage`，key `jianghu_admin_token`。
-- 刷新页面可自动恢复；关闭标签页清除。
-- 退出立即删除。
-- 不写 `localStorage`、不写 URL、不写 cookie。
+本站不接数据库，内容以静态 HTML 表达。为保持一致性，每个项目 / 文章遵循固定信息：
 
-### 7.2 表单
+**项目字段**
 
-- 站点信息、关于、技能、项目、文章、高级 JSON 六个栏目。
-- 字段用 `data-scope` / `data-index` / `data-key` / `data-parse` 标记。
-- `collectAll()` 只收集当前栏目，避免未渲染栏目被空数组覆盖。
-- 列表增删前先 `collectAll()`，防止丢失当前编辑。
-- 文章使用“左侧列表 + 右侧编辑器”，切换文章前 `readPostEditor()`。
-- 标签按中英文逗号 / 顿号拆分；数据按 `label | value` 行解析；时间线按 `date | title | desc`。
+- 编号、标题、副标题、年份、类型
+- 简介、技术标签、亮点（2～3 条）
+- 链接：线上地址、源码、案例页
+- 封面图与 alt
 
-### 7.3 保存
+**文章字段**
 
-```text
-点击保存
-  → 若在高级 JSON：先 JSON.parse 校验
-  → 收集当前栏目
-  → 校验文章 slug 唯一
-  → PUT /repos/{owner}/{repo}/contents/data/content.json
-     body: { message, content: base64(JSON), sha, branch: "main" }
-  → 更新 sha
-  → 显示 commit 链接 + Pages 提示
-```
+- 编号、标题、摘要、发布日期、阅读时长、标签
+- 正文标题层级：h1 → h2 → h3
+- 文末：上一篇 / 下一篇 / 返回首页
 
-- 使用 `sha` 做乐观并发控制；409 时提示重新载入，不覆盖。
-- 401 / 403 提示 Token 或 Contents 权限问题。
-- 保存成功后 `meta.updatedAt` 更新为当天。
-- Base64 使用 `TextEncoder` 分块编码，避免 `btoa` 中文报错。
+新增文章流程：
 
-### 7.4 安全
+1. 复制 `posts/` 下任意文章作为模板。
+2. 修改 title、description、canonical、正文与元信息。
+3. 在首页 `#notes` 列表添加一张卡片。
+4. 本地打开检查后提交。
 
-- 后台页面公开但 `noindex`；`robots.txt` Disallow `/admin/`。
-- 写权限完全由 GitHub Token 控制；没有 Token 只能看登录页。
-- 不在任何前端文件写 Token。
-- 动态正文清洗后才插入 DOM。
-- 所有表单输出 `esc()`。
+## 8. 性能设计
 
-## 8. 样式架构
-
-- `assets/css/style.css`：前台；`:root` Token；BEM 类名；响应式断点 1080 / 920 / 640 / 380。
-- `admin/admin.css`：后台；复用 Token 与 `.btn`；登录页、工具栏、标签、表单、文章分栏、移动端。
-- 后台 `[hidden] { display:none !important; }`，避免 `.login { display:grid }` 覆盖 hidden。
-- 表单输入、文本域、按钮焦点样式统一；后台不使用外部 UI 库。
+- 无框架、无外部字体、无 CDN；首屏只有 HTML/CSS/JS 与少量图片。
+- 首屏图片使用固定宽高，避免 CLS；非首屏图片 `loading="lazy"`。
+- 项目截图压缩到 1200px 宽；OG 图 1200×630。
+- CSS 单文件，约 30KB；JS 单文件，约 3KB。
+- 目标：Lighthouse 移动端 Performance ≥ 90，LCP < 2.5s（GitHub Pages 网络环境下）。
 
 ## 9. SEO
 
-- 首页、项目页静态 title / description / canonical / OG。
-- 动态文章由 JS 更新 title、description、canonical、OG、BlogPosting。
-- 旧静态文章 noindex + canonical 动态页。
-- `sitemap.xml` 使用 `/post.html?slug=...`。
-- `robots.txt` 禁止 `/admin/`。
-- 首页 JSON-LD：Person + WebSite。
+- 每页独立 `<title>` 与 `<meta name="description">`。
+- `link rel="canonical"` 指向正式域名。
+- Open Graph：`og:title`、`og:description`、`og:image`、`og:url`。
+- 首页 JSON-LD：`Person` + `WebSite`；文章页 `BlogPosting`。
+- 语义化标题层级与图片 alt。
+- `robots.txt` + `sitemap.xml`。
 
-## 10. 性能
+## 10. 部署
 
-- 首页不引入框架、外部字体、CDN。
-- `content.json` 约 22KB；CSS 约 40KB；JS 三个文件合计约 20KB。
-- 首屏只加载 logo；项目截图懒加载。
-- 后台仅登录后才渲染表单，减少初始 DOM。
-- 目标：Lighthouse 移动端 Performance ≥ 90；LCP < 2.5s。
+### 10.1 仓库
 
-## 11. 部署
-
-### 11.1 仓库
-
-- 仓库：`hujiang888/hujiang888.github.io`
-- 分支：`main`
+- GitHub 用户名：`hujiang888`
+- 用户站仓库：`hujiang888.github.io`
+- 默认分支：`main`
 - 站点根目录：仓库根目录
 - 域名：https://hujiang888.github.io/
-- 后台：https://hujiang888.github.io/admin/
 
-### 11.2 发布流程
+### 10.2 发布流程
 
 ```bash
 git add .
-git commit -m "feat: ..."
+git commit -m "content: ..."
 git push origin main
 ```
 
-GitHub Pages 使用 `main` 根目录构建；`.nojekyll` 关闭 Jekyll 处理。
+GitHub Pages 使用 `main` 分支根目录构建；`docs` 不需要。仓库根目录的 `.nojekyll` 防止 Jekyll 忽略以下划线开头的文件。
 
-### 11.3 后台保存流程
+### 10.3 首次配置
 
-1. 打开 `/admin/`。
-2. 生成 Fine-grained Token：仅本仓库，Contents Read and write。
-3. 登录、修改、保存。
-4. GitHub 生成 commit；Pages 约 1–2 分钟构建。
-5. 前台刷新验证。
+1. 创建公开仓库 `hujiang888.github.io`。
+2. 推送站点文件。
+3. 在 Settings → Pages 选择 `Deploy from a branch`，分支 `main`，目录 `/ (root)`。
+4. 等待 1～3 分钟，访问 https://hujiang888.github.io/ 验证。
 
-### 11.4 验证清单
+### 10.4 验证清单
 
-- [ ] 首页 200，HTTPS 正常。
-- [ ] `data/content.json` 200，UTF-8 正常。
-- [ ] 后台登录成功，SHA 显示。
-- [ ] 保存后 commit 出现，Pages 构建完成。
-- [ ] 前台显示新内容。
-- [ ] 320–1440px 无横向滚动。
-- [ ] 控制台无报错，内部链接无 404。
+- [ ] 首页 200，HTTPS 正常
+- [ ] 320/390/768/1024/1440 无横向滚动
+- [ ] 移动端菜单可操作
+- [ ] 所有项目与文章链接 200
+- [ ] 控制台无报错
+- [ ] OG 图与 favicon 加载
 
-## 12. 测试方案
+## 11. 测试方案
 
-### 12.1 前台
+### 11.1 本地静态服务
 
-- 320 / 390 / 768 / 1024 / 1440 视口。
-- `scrollWidth <= innerWidth`。
-- 首页 JSON 渲染后的姓名、段落数、技能数、项目数、文章链接。
-- 动态文章：标题、目录、清洗后的 `<strong>`、上下篇、阅读进度。
-- 移动菜单、复制、返回链接。
-- 所有内部 `href` / `src` 200。
+```bash
+python -m http.server 8080
+```
 
-### 12.2 后台 mock
+访问 http://localhost:8080。
 
-用 Playwright 拦截 `api.github.com`：
+### 11.2 Playwright 检查
 
-- `/user` 返回登录名。
-- GET contents 返回本地 JSON 的 Base64。
-- PUT 捕获请求体，Base64 解码后校验 `profile.name`、`skills` 等。
-- 验证登录、切换栏目、添加技能、保存、提示。
+- 5 个视口宽度：320 / 390 / 768 / 1024 / 1440。
+- 检查 `scrollWidth <= innerWidth`。
+- 点击移动端菜单，验证展开 / 收起与链接跳转。
+- 滚动首页，验证导航高亮与 `.reveal.is-visible`。
+- 打开项目详情与 3 篇文章，验证标题、阅读进度、返回链接。
+- 收集 console error 与 pageerror。
+- 检查所有内部 `href` / `src` 文件存在。
 
-### 12.3 真实链路
+### 11.3 视觉检查
 
-- 用真实 Token 登录线上后台。
-- 修改一个无风险字段（如 `profile.updated`）。
-- 保存，确认 commit、Pages 构建、前台变化。
-- 验证 Token 未出现在仓库 / 页面源码。
+- 首页桌面 / 移动端截图。
+- 项目详情、文章页截图。
+- 检查标题换行、卡片等高、图片裁切、页脚对齐。
 
-## 13. 风险与后续
+## 12. 风险与后续演进
 
 | 风险 | 应对 |
 | --- | --- |
-| Token 泄露 | 最小权限、sessionStorage、泄露即撤销 |
-| 409 覆盖 | sha 校验，提示重新载入 |
-| 动态 HTML XSS | 白名单清洗 |
-| Pages 延迟 | 提示构建时间，强刷 |
-| JSON 写坏 | 保存前 parse 校验；Git 回滚 |
-| 老师要求 Node/MySQL | 说明 Git CMS 边界；如必须，另加服务端与数据库部署 |
+| 内容少、显得空 | 用项目详情与真实文章补充信息密度 |
+| 图片加载慢 | 压缩、懒加载、限制首屏图片数量 |
+| 文章增多后维护困难 | 后续迁移到 Astro / 静态站点生成器 |
+| GitHub Pages 缓存 | 修改后强刷；必要时在 URL 加版本参数 |
 
-后续可扩展：
-
-- 图片上传（GitHub API 写 `assets/img/`）。
-- 草稿 / 发布状态字段。
-- 版本对比与一键回滚。
-- 文章 Markdown 编辑 + 预览。
-- RSS、搜索、标签筛选。
-- 如果需要传统后端：Express + SQLite/MySQL + JWT，部署到 Render / Railway / 云服务器，前台改为调用 REST API。
+后续可扩展：文章标签筛选、全文搜索、RSS、深浅色主题切换、404 页面、访问统计（隐私友好）。
