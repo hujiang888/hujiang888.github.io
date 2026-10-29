@@ -705,7 +705,8 @@ code {
   letter-spacing: -0.01em;
 }
 
-.about-copy > p:not(.lead) {
+.about-copy > p:not(.lead),
+.about-copy #aboutParagraphs p {
   max-width: 560px;
   margin-bottom: 16px;
   color: var(--muted);
