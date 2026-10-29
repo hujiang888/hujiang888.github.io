@@ -1,0 +1,69 @@
+<%- include('partials/head', {
+  title: project.title + ' · 项目详情 · ' + site.name,
+  description: project.description,
+  canonical: baseUrl + '/project/' + project.slug,
+  ogType: 'article',
+  ogImage: project.cover ? (baseUrl + '/' + project.cover.replace(/^\//, '')) : undefined
+}) %>
+<%- include('partials/header', { active: 'work' }) %>
+
+<div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+<main id="main">
+  <header class="project-hero">
+    <div class="container project-hero__inner">
+      <a class="back-link" href="/#work">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        返回项目
+      </a>
+      <p class="article-kicker"><%= project.kicker %></p>
+      <h1><%= project.title %> <span><%= project.subtitle %></span></h1>
+      <p class="article-deck"><%= project.description %></p>
+      <div class="article-meta">
+        <span>独立开发</span><span>Manifest V3</span><span><%= site.updated %></span><span>v1.1.0</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <% if (project.cover) { %>
+      <figure class="project-cover">
+        <img src="<%= asset(project.cover) %>" alt="<%= project.cover_alt || project.title %>" width="1200" height="600" />
+      </figure>
+    <% } %>
+
+    <% if (project.facts.length) { %>
+      <div class="project-metrics">
+        <% project.facts.slice(0, 4).forEach((fact) => { %>
+          <div><span><%= fact.label %></span><strong><%= fact.value %></strong></div>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <div class="article-layout">
+      <aside class="article-toc" aria-label="项目目录">
+        <p class="article-toc__label">ON THIS PAGE</p>
+        <% toc.forEach((item) => { %>
+          <a href="#<%= item.id %>"><%= item.text %></a>
+        <% }) %>
+      </aside>
+
+      <article class="article-body">
+        <%- projectHtml %>
+        <div class="project-links-box">
+          <% if (project.links.live) { %>
+            <a class="btn btn--accent" href="<%= project.links.live %>" target="_blank" rel="noreferrer">线上体验</a>
+          <% } %>
+          <% if (project.links.repo) { %>
+            <a class="btn btn--ghost" href="<%= project.links.repo %>" target="_blank" rel="noreferrer">GitHub 仓库</a>
+          <% } %>
+          <% if (project.links.detail && project.links.detail !== '/project/' + project.slug) { %>
+            <a class="btn btn--ghost" href="<%= project.links.detail %>">更多内容</a>
+          <% } %>
+        </div>
+      </article>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer', { postScript: true }) %>

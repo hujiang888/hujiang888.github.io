@@ -1,0 +1,25 @@
+<header class="site-header" id="top">
+  <div class="container header__inner">
+    <a class="brand" href="/" aria-label="<%= site.name %> · 返回首页">
+      <img class="brand__mark" src="/assets/img/logo.svg" alt="" width="38" height="38" />
+      <span class="brand__text"><strong><%= site.name %></strong><span>FRONTEND · AI</span></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a class="nav__link <%= active === 'about' ? 'is-active' : '' %>" href="/#about">关于</a>
+      <a class="nav__link <%= active === 'skills' ? 'is-active' : '' %>" href="/#skills">技能</a>
+      <a class="nav__link <%= active === 'work' ? 'is-active' : '' %>" href="/#work">项目</a>
+      <a class="nav__link <%= active === 'notes' ? 'is-active' : '' %>" href="/#notes">笔记</a>
+      <a class="nav__link <%= active === 'contact' ? 'is-active' : '' %>" href="/#contact">联系</a>
+      <a class="nav__ext" href="<%= site.github %>" target="_blank" rel="noreferrer">
+        GitHub
+        <svg class="icon"><use href="#i-arrow"></use></svg>
+      </a>
+    </nav>
+
+    <button class="nav__toggle" id="navToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+      <svg class="icon icon--menu"><use href="#i-menu"></use></svg>
+      <svg class="icon icon--close"><use href="#i-close"></use></svg>
+    </button>
+  </div>
+</header>

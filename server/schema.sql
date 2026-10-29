@@ -1,0 +1,96 @@
+-- Jiang Hu · 个人作品集
+-- MySQL 5.7 / 8.0
+-- 数据库：jianghu_portfolio
+
+SET NAMES utf8mb4;
+
+CREATE TABLE IF NOT EXISTS site_settings (
+  id TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  profile_name VARCHAR(80) NOT NULL DEFAULT '',
+  profile_en VARCHAR(80) NOT NULL DEFAULT '',
+  role VARCHAR(120) NOT NULL DEFAULT '',
+  focus VARCHAR(120) NOT NULL DEFAULT '',
+  lead TEXT,
+  meta VARCHAR(160) NOT NULL DEFAULT '',
+  status VARCHAR(120) NOT NULL DEFAULT '',
+  location VARCHAR(120) NOT NULL DEFAULT '',
+  doing VARCHAR(120) NOT NULL DEFAULT '',
+  updated VARCHAR(40) NOT NULL DEFAULT '',
+  github VARCHAR(255) NOT NULL DEFAULT '',
+  github_name VARCHAR(80) NOT NULL DEFAULT '',
+  about_intro TEXT,
+  about_paragraphs LONGTEXT,
+  about_values LONGTEXT,
+  about_now LONGTEXT,
+  about_timeline LONGTEXT,
+  contact_intro TEXT,
+  contact_note VARCHAR(255) NOT NULL DEFAULT '',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS skills (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sort_order INT NOT NULL DEFAULT 0,
+  title VARCHAR(80) NOT NULL,
+  level VARCHAR(60) NOT NULL DEFAULT '',
+  description TEXT,
+  tags LONGTEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_skills_sort (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS projects (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sort_order INT NOT NULL DEFAULT 0,
+  slug VARCHAR(80) NOT NULL,
+  title VARCHAR(120) NOT NULL,
+  subtitle VARCHAR(120) NOT NULL DEFAULT '',
+  kicker VARCHAR(160) NOT NULL DEFAULT '',
+  description TEXT,
+  tags LONGTEXT,
+  facts LONGTEXT,
+  live_url VARCHAR(255) NOT NULL DEFAULT '',
+  repo_url VARCHAR(255) NOT NULL DEFAULT '',
+  detail_url VARCHAR(255) NOT NULL DEFAULT '',
+  featured TINYINT(1) NOT NULL DEFAULT 0,
+  cover VARCHAR(255) NOT NULL DEFAULT '',
+  cover_alt VARCHAR(255) NOT NULL DEFAULT '',
+  cover_class VARCHAR(80) NOT NULL DEFAULT 'project-cover--site',
+  cover_word VARCHAR(120) NOT NULL DEFAULT '',
+  cover_note VARCHAR(120) NOT NULL DEFAULT '',
+  detail_html LONGTEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_projects_slug (slug),
+  KEY idx_projects_sort (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS posts (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sort_order INT NOT NULL DEFAULT 0,
+  slug VARCHAR(80) NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  date_text VARCHAR(40) NOT NULL DEFAULT '',
+  read_time VARCHAR(40) NOT NULL DEFAULT '',
+  category VARCHAR(60) NOT NULL DEFAULT '',
+  excerpt TEXT,
+  content_html LONGTEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_posts_slug (slug),
+  KEY idx_posts_sort (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  username VARCHAR(60) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_admin_username (username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,34 @@
+<%- include('partials/head', { title: '项目' }) %>
+<%- include('partials/top', { active: 'projects', title: '项目', subtitle: '首页精选、项目卡片与详情页' }) %>
+
+<div class="admin-card">
+  <div class="admin-card__head">
+    <div><h2>项目列表</h2><p><%= projects.length %> 个项目 · 第一个 featured 会出现在首页精选位</p></div>
+    <a class="btn btn--accent admin-small-btn" href="/admin/projects/new">新建项目</a>
+  </div>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead><tr><th>排序</th><th>项目</th><th>Slug</th><th>精选</th><th>操作</th></tr></thead>
+      <tbody>
+        <% projects.forEach((project, index) => { %>
+          <tr>
+            <td><%= String(index + 1).padStart(2, '0') %></td>
+            <td><strong><%= project.title %></strong><small><%= project.kicker %></small></td>
+            <td><code><%= project.slug %></code></td>
+            <td><%= project.featured ? '是' : '—' %></td>
+            <td class="admin-table__actions">
+              <a href="/admin/projects/<%= project.id %>/edit">编辑</a>
+              <% if (project.detail_html) { %><a href="/project/<%= project.slug %>" target="_blank" rel="noreferrer">详情</a><% } %>
+              <form method="post" action="/admin/projects/<%= project.id %>/delete" data-confirm="确定删除这个项目吗？">
+                <input type="hidden" name="_csrf" value="<%= csrf %>" />
+                <button class="link-danger" type="submit">删除</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/bottom') %>

@@ -1,0 +1,48 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/top', { active: 'projects', title: title, subtitle: subtitle }) %>
+
+<form method="post" action="<%= project.id ? '/admin/projects/' + project.id : '/admin/projects' %>" class="admin-form">
+  <input type="hidden" name="_csrf" value="<%= csrf %>" />
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>基本信息</h2><p>首页卡片与项目详情共用</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span>标题</span><input name="title" value="<%= project.title %>" required /></label>
+      <label class="field"><span>副标题</span><input name="subtitle" value="<%= project.subtitle %>" /></label>
+      <label class="field"><span>Slug（URL）</span><input name="slug" value="<%= project.slug %>" required pattern="[A-Za-z0-9\-]+" /></label>
+      <label class="field"><span>Kicker（年份 · 类型）</span><input name="kicker" value="<%= project.kicker %>" /></label>
+      <label class="field field--full"><span>一句话描述</span><textarea name="description" rows="3"><%= project.description %></textarea></label>
+      <label class="field field--full"><span>标签（逗号分隔）</span><input name="tags" value="<%= project.tags.join(', ') %>" /></label>
+      <label class="field field--full"><span>数据（每行：标签 | 值）</span><textarea name="facts" rows="3"><%= project.facts.map((fact) => `${fact.label} | ${fact.value}`).join('\n') %></textarea></label>
+      <label class="field field--check"><input type="checkbox" name="featured" value="1" <%= project.featured ? 'checked' : '' %> /><span>设为首屏精选项目</span></label>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>链接</h2><p>线上、源码与详情</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span>线上链接</span><input name="live_url" value="<%= project.links.live %>" /></label>
+      <label class="field"><span>源码链接</span><input name="repo_url" value="<%= project.links.repo %>" /></label>
+      <label class="field field--full"><span>详情链接（可填 /project/slug 或 /post/slug）</span><input name="detail_url" value="<%= project.links.detail %>" /></label>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>封面与详情正文</h2><p>封面图先放入 assets/img/，这里填相对路径</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span>封面图路径</span><input name="cover" value="<%= project.cover %>" placeholder="assets/img/imagegrab-feature.png" /></label>
+      <label class="field"><span>封面 alt</span><input name="cover_alt" value="<%= project.cover_alt %>" /></label>
+      <label class="field"><span>封面样式类</span><input name="cover_class" value="<%= project.cover_class %>" placeholder="project-cover--site" /></label>
+      <label class="field"><span>封面大字（可换行）</span><textarea name="cover_word" rows="2"><%= project.cover_word %></textarea></label>
+      <label class="field"><span>封面备注</span><input name="cover_note" value="<%= project.cover_note %>" /></label>
+      <label class="field field--full"><span>详情正文 HTML</span><textarea name="detail_html" rows="18"><%= project.detail_html %></textarea></label>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn btn--accent" type="submit">保存项目</button>
+    <a class="btn btn--ghost" href="/admin/projects">返回列表</a>
+  </div>
+</form>
+
+<%- include('partials/bottom') %>

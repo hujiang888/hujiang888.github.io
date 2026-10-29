@@ -1,0 +1,42 @@
+<%- include('partials/head', { title: '概览' }) %>
+<%- include('partials/top', { active: 'dashboard', title: '概览', subtitle: '内容总览与最近更新' }) %>
+
+<div class="admin-stats">
+  <a class="admin-stat" href="/admin/skills"><span>SKILLS</span><strong><%= counts.skills %></strong><em>技能条目</em></a>
+  <a class="admin-stat" href="/admin/projects"><span>PROJECTS</span><strong><%= counts.projects %></strong><em>项目卡片</em></a>
+  <a class="admin-stat" href="/admin/posts"><span>POSTS</span><strong><%= counts.posts %></strong><em>篇文章</em></a>
+</div>
+
+<div class="admin-card">
+  <div class="admin-card__head">
+    <div><h2>最近文章</h2><p>按当前排序显示</p></div>
+    <a class="btn btn--ghost admin-small-btn" href="/admin/posts/new">新建文章</a>
+  </div>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead><tr><th>标题</th><th>日期</th><th>分类</th><th>操作</th></tr></thead>
+      <tbody>
+        <% recentPosts.forEach((post) => { %>
+          <tr>
+            <td><%= post.title %></td>
+            <td><%= post.date_text %></td>
+            <td><%= post.category %></td>
+            <td><a href="/admin/posts/<%= post.id %>/edit">编辑</a> · <a href="/post/<%= post.slug %>" target="_blank" rel="noreferrer">查看</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="admin-card">
+  <div class="admin-card__head"><div><h2>快捷入口</h2><p>常用内容维护</p></div></div>
+  <div class="admin-quick">
+    <a href="/admin/profile"><span>01</span><strong>站点信息</strong><em>首屏、页脚、联系区</em></a>
+    <a href="/admin/about"><span>02</span><strong>关于</strong><em>段落、原则、时间线</em></a>
+    <a href="/admin/projects"><span>03</span><strong>项目</strong><em>精选、卡片、详情</em></a>
+    <a href="/admin/posts"><span>04</span><strong>文章</strong><em>新建与编辑</em></a>
+  </div>
+</div>
+
+<%- include('partials/bottom') %>

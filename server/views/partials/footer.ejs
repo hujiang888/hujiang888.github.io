@@ -1,0 +1,24 @@
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <img src="/assets/img/logo.svg" alt="" width="34" height="34" />
+          <div>
+            <strong><%= site.name %></strong>
+            <p>Node.js + MySQL 驱动，使用原生 HTML / CSS / JavaScript。</p>
+          </div>
+        </div>
+        <div class="footer__meta">
+          <span>© <span id="year">2026</span> <%= site.name %></span>
+          <span>Last updated <%= site.updated %></span>
+          <a href="<%= site.github %>" target="_blank" rel="noreferrer">GitHub <svg class="icon"><use href="#i-arrow"></use></svg></a>
+          <a href="/admin/login">内容后台</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+    <% if (typeof postScript !== 'undefined' && postScript) { %>
+      <script src="/assets/js/post.js"></script>
+    <% } %>
+  </body>
+</html>

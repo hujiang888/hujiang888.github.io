@@ -1,0 +1,54 @@
+<%- include('partials/head', {
+  title: post.title + ' · ' + site.name,
+  description: post.excerpt,
+  canonical: baseUrl + '/post/' + post.slug,
+  ogType: 'article'
+}) %>
+<%- include('partials/header', { active: 'notes' }) %>
+
+<div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+<main id="main">
+  <header class="article-hero">
+    <div class="container article-hero__inner">
+      <a class="back-link" href="/#notes">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        返回笔记
+      </a>
+      <p class="article-kicker">NOTE · <%= post.category %> · <%= post.date_text %></p>
+      <h1><%= post.title %></h1>
+      <p class="article-deck"><%= post.excerpt %></p>
+      <div class="article-meta">
+        <span><%= site.name %></span><span><%= post.read_time %></span><span><%= post.category %></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container article-layout">
+    <aside class="article-toc" aria-label="文章目录">
+      <p class="article-toc__label">ON THIS PAGE</p>
+      <% toc.forEach((item) => { %>
+        <a href="#<%= item.id %>"><%= item.text %></a>
+      <% }) %>
+    </aside>
+
+    <article class="article-body">
+      <%- bodyHtml %>
+      <p class="article-end">写于 <%= post.date_text %>。</p>
+
+      <nav class="article-nav" aria-label="文章导航">
+        <% if (prev) { %>
+          <a href="/post/<%= prev.slug %>"><span>PREV</span><strong><%= prev.title %></strong></a>
+        <% } %>
+        <% if (next) { %>
+          <a href="/post/<%= next.slug %>"><span>NEXT</span><strong><%= next.title %></strong></a>
+        <% } %>
+        <% if (!prev && !next) { %>
+          <a href="/#notes"><span>BACK</span><strong>返回全部笔记</strong></a>
+        <% } %>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<%- include('partials/footer', { postScript: true }) %>

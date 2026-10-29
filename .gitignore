@@ -4,3 +4,8 @@ desktop.ini
 node_modules/
 tests/output/
 *.log
+
+server/.env
+server/node_modules/
+server/.mysql-data/
+server/.mysql-logs/

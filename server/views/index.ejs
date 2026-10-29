@@ -1,0 +1,309 @@
+<%- include('partials/head', {
+  title: site.name + ' · ' + site.focus + ' | 个人作品集',
+  description: site.name + ' 的个人作品集：' + site.role + '，关注 ' + site.focus + '。这里记录项目、实验与开发笔记。',
+  canonical: baseUrl + '/',
+  ogType: 'website'
+}) %>
+<%- include('partials/header', { active: 'about' }) %>
+
+<main id="main">
+  <section class="hero" id="home">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow">
+          <span>PORTFOLIO / 2026</span>
+          <span class="eyebrow__line" aria-hidden="true"></span>
+          <span>DALIAN, CN</span>
+        </p>
+
+        <h1 class="hero__title"><%= site.name %></h1>
+
+        <p class="hero__role"><%= site.role %> <em>×</em> <%= site.focus %></p>
+        <p class="hero__lead"><%= site.lead %></p>
+
+        <div class="hero__actions">
+          <a class="btn btn--accent" href="#work">
+            查看项目
+            <svg class="icon"><use href="#i-arrow"></use></svg>
+          </a>
+          <a class="btn btn--ghost" href="<%= site.github %>" target="_blank" rel="noreferrer">
+            <svg class="icon"><use href="#i-github"></use></svg>
+            GitHub
+          </a>
+        </div>
+
+        <ul class="hero__meta">
+          <li><%= site.meta %></li>
+          <li><span class="dot" aria-hidden="true"></span><%= site.status %></li>
+        </ul>
+      </div>
+
+      <aside class="profile-card" aria-label="个人索引">
+        <div class="profile-card__top">
+          <span>INDEX 01</span>
+          <span>2026</span>
+        </div>
+
+        <div class="profile-card__mark" aria-hidden="true">HJ</div>
+        <p class="profile-card__name"><%= site.en %></p>
+        <p class="profile-card__role">IoT · Frontend · AI</p>
+
+        <dl class="profile-card__facts">
+          <div><dt>坐标</dt><dd><%= site.location %></dd></div>
+          <div><dt>正在做</dt><dd><%= site.doing %></dd></div>
+          <div><dt>最近更新</dt><dd><%= site.updated %></dd></div>
+        </dl>
+
+        <span class="profile-card__stamp">OPEN TO<br />COLLABORATE</span>
+        <span class="profile-card__sun" aria-hidden="true">
+          <svg class="icon"><use href="#i-sun"></use></svg>
+        </span>
+      </aside>
+    </div>
+
+    <div class="container hero__foot">
+      <span>SCROLL TO EXPLORE</span>
+      <span>39.0°N · 121.6°E</span>
+    </div>
+  </section>
+
+  <section class="section section--about" id="about">
+    <div class="container">
+      <div class="section-head">
+        <p class="section-label"><span>01</span> ABOUT</p>
+        <h2>先想清楚，<br />再动手。</h2>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-copy reveal">
+          <p class="lead"><%= site.about.intro %></p>
+          <div id="aboutParagraphs">
+            <% site.about.paragraphs.forEach((paragraph) => { %>
+              <p><%= paragraph %></p>
+            <% }) %>
+          </div>
+        </div>
+
+        <div class="about-side reveal">
+          <ol class="timeline">
+            <% site.about.timeline.forEach((item, index) => { %>
+              <li class="<%= index === site.about.timeline.length - 1 ? 'timeline__now' : '' %>">
+                <span class="timeline__date"><%= item.date %></span>
+                <div><strong><%= item.title %></strong><p><%= item.desc %></p></div>
+              </li>
+            <% }) %>
+          </ol>
+
+          <div class="about-now">
+            <p class="about-now__label">NOW / <%= site.updated %></p>
+            <ul>
+              <% site.about.now.forEach((item, index) => { %>
+                <li><span><%= String(index + 1).padStart(2, '0') %></span><%= item %></li>
+              <% }) %>
+            </ul>
+          </div>
+
+          <ul class="values">
+            <% site.about.values.forEach((value, index) => { %>
+              <li><span><%= String(index + 1).padStart(2, '0') %></span><strong><%= value %></strong></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--skills" id="skills">
+    <div class="container">
+      <div class="section-head section-head--row">
+        <div>
+          <p class="section-label"><span>02</span> SKILLS</p>
+          <h2>工具是手段，<br />把事做成才是目的。</h2>
+        </div>
+        <p class="section-head__note">
+          不追求把所有关键词写满。<br />
+          这里只记录真正用过、踩过坑的部分。
+        </p>
+      </div>
+
+      <div class="skill-grid">
+        <% skills.forEach((skill, index) => { %>
+          <article class="skill-card reveal">
+            <div class="skill-card__head">
+              <span class="skill-card__num"><%= String(index + 1).padStart(2, '0') %></span>
+              <h3><%= skill.title %></h3>
+              <span class="skill-card__level"><%= skill.level %></span>
+            </div>
+            <p><%= skill.description %></p>
+            <ul class="tags">
+              <% skill.tags.forEach((tag) => { %>
+                <li><%= tag %></li>
+              <% }) %>
+            </ul>
+          </article>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--work" id="work">
+    <div class="container">
+      <div class="section-head">
+        <p class="section-label"><span>03</span> SELECTED WORK</p>
+        <h2>做过的东西，<br />都留在这里。</h2>
+      </div>
+
+      <% if (featured) { %>
+        <article class="project-feature reveal">
+          <a class="project-feature__media" href="<%= featured.links.detail || featured.links.live || '#' %>" aria-label="查看 <%= featured.title %> 项目详情">
+            <img
+              src="<%= asset(featured.cover || 'assets/img/og-cover.png') %>"
+              alt="<%= featured.cover_alt || featured.title %>"
+              width="1200"
+              height="800"
+              loading="lazy"
+            />
+            <span class="project-feature__badge">FEATURED / 01</span>
+          </a>
+
+          <div class="project-feature__body">
+            <p class="project-kicker"><%= featured.kicker %></p>
+            <h3><%= featured.title %> <span><%= featured.subtitle %></span></h3>
+            <p class="project-desc"><%= featured.description %></p>
+
+            <ul class="tags">
+              <% featured.tags.forEach((tag) => { %>
+                <li><%= tag %></li>
+              <% }) %>
+            </ul>
+
+            <dl class="project-facts">
+              <% featured.facts.slice(0, 4).forEach((fact) => { %>
+                <div><dt><%= fact.label %></dt><dd><%= fact.value %></dd></div>
+              <% }) %>
+            </dl>
+
+            <div class="project-links">
+              <% if (featured.links.live) { %>
+                <a class="link-accent" href="<%= featured.links.live %>" target="_blank" rel="noreferrer">
+                  线上体验 <svg class="icon"><use href="#i-arrow"></use></svg>
+                </a>
+              <% } %>
+              <% if (featured.links.repo) { %>
+                <a href="<%= featured.links.repo %>" target="_blank" rel="noreferrer">源码</a>
+              <% } %>
+              <% if (featured.links.detail) { %>
+                <a href="<%= featured.links.detail %>">项目详情</a>
+              <% } %>
+            </div>
+          </div>
+        </article>
+      <% } %>
+
+      <div class="project-grid">
+        <% otherProjects.forEach((project, index) => { %>
+          <article class="project-card reveal">
+            <div class="project-card__cover <%= project.cover_class %>" aria-hidden="true">
+              <span class="project-cover__index"><%= String(index + 2).padStart(2, '0') %></span>
+              <span class="project-cover__word<%= /HJ/i.test(project.cover_word || '') ? ' project-cover__word--serif' : '' %>"><%- coverWord(project.cover_word) %></span>
+              <span class="project-cover__note"><%= project.cover_note %></span>
+            </div>
+            <div class="project-card__body">
+              <p class="project-kicker"><%= project.kicker %></p>
+              <h3><%= project.title %></h3>
+              <p><%= project.description %></p>
+              <ul class="tags">
+                <% project.tags.forEach((tag) => { %>
+                  <li><%= tag %></li>
+                <% }) %>
+              </ul>
+              <a class="link-accent" href="<%= project.links.detail || project.links.live || project.links.repo || '#' %>"<%= /^https?:/.test(project.links.detail || project.links.live || '') ? ' target="_blank" rel="noreferrer"' : '' %>>
+                <%= project.links.detail && project.links.detail.indexOf('/post/') === 0 ? '查看实验笔记' : project.links.repo ? '查看源码' : '查看详情' %>
+                <svg class="icon"><use href="#i-arrow"></use></svg>
+              </a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+
+      <p class="work-more reveal">
+        另外还做过：单片机课程实验、物联网感知层实验、数据结构课程设计。
+      </p>
+    </div>
+  </section>
+
+  <section class="section section--notes" id="notes">
+    <div class="container">
+      <div class="section-head section-head--row">
+        <div>
+          <p class="section-label"><span>04</span> NOTES</p>
+          <h2>写作是另一种调试。</h2>
+        </div>
+        <p class="section-head__note">把踩过的坑写下来，<br />下次就能少走一点。</p>
+      </div>
+
+      <div class="post-list">
+        <% posts.forEach((post, index) => { %>
+          <a class="post-row reveal" href="/post/<%= post.slug %>">
+            <span class="post-row__num"><%= String(index + 1).padStart(2, '0') %></span>
+            <div class="post-row__body">
+              <div class="post-row__meta">
+                <span><%= post.date_text %></span><span><%= post.read_time %></span><span><%= post.category %></span>
+              </div>
+              <h3><%= post.title %></h3>
+              <p><%= post.excerpt %></p>
+            </div>
+            <span class="post-row__arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span>
+          </a>
+        <% }) %>
+      </div>
+
+      <p class="notes-more">持续更新中 · 目前有 <%= posts.length %> 篇</p>
+    </div>
+  </section>
+
+  <section class="section section--contact" id="contact">
+    <div class="container contact">
+      <div class="contact__copy reveal">
+        <p class="section-label"><span>05</span> CONTACT</p>
+        <h2>如果你也在做<br />有意思的事。</h2>
+        <p><%= site.contact.intro %></p>
+
+        <div class="contact__actions">
+          <a class="btn btn--accent" href="<%= site.github %>" target="_blank" rel="noreferrer">
+            <svg class="icon"><use href="#i-github"></use></svg>
+            去 GitHub 找我
+          </a>
+          <button class="btn btn--ghost" type="button" data-copy="<%= site.githubName %>">
+            <svg class="icon"><use href="#i-copy"></use></svg>
+            <span class="copy-label">复制用户名</span>
+          </button>
+        </div>
+
+        <p class="contact__note"><%= site.contact.note %></p>
+      </div>
+
+      <div class="contact__cards reveal">
+        <a class="contact-card" href="<%= site.github %>" target="_blank" rel="noreferrer">
+          <span class="contact-card__label">GitHub</span>
+          <strong>@<%= site.githubName %></strong>
+          <span class="contact-card__desc">代码、实验与项目</span>
+          <svg class="icon"><use href="#i-arrow"></use></svg>
+        </a>
+        <a class="contact-card" href="https://hujiang888.github.io/imagegrab/" target="_blank" rel="noreferrer">
+          <span class="contact-card__label">LIVE PROJECT</span>
+          <strong>ImageGrab</strong>
+          <span class="contact-card__desc">一个已经上线的浏览器扩展</span>
+          <svg class="icon"><use href="#i-arrow"></use></svg>
+        </a>
+        <div class="contact-card contact-card--static">
+          <span class="contact-card__label">STACK</span>
+          <strong>Node.js + MySQL</strong>
+          <span class="contact-card__desc">本站前台与后台由 Express 提供服务</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer', { postScript: false }) %>

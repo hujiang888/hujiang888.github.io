@@ -1,0 +1,38 @@
+<%- include('partials/head', { title: '技能' }) %>
+<%- include('partials/top', { active: 'skills', title: '技能', subtitle: '添加、编辑与删除技能卡片' }) %>
+
+<div class="admin-card">
+  <div class="admin-card__head"><div><h2>新增技能</h2><p>保存后立即出现在首页技能区</p></div></div>
+  <form method="post" action="/admin/skills" class="admin-form">
+    <input type="hidden" name="_csrf" value="<%= csrf %>" />
+    <div class="form-grid">
+      <label class="field"><span>标题</span><input name="title" placeholder="例如：前端" required /></label>
+      <label class="field"><span>熟练度描述</span><input name="level" placeholder="日常使用 / 课程实践" /></label>
+      <label class="field field--full"><span>说明</span><textarea name="description" rows="2"></textarea></label>
+      <label class="field field--full"><span>标签（逗号分隔）</span><input name="tags" placeholder="HTML, CSS, JavaScript" /></label>
+    </div>
+    <div class="admin-actions"><button class="btn btn--accent" type="submit">添加技能</button></div>
+  </form>
+</div>
+
+<div class="admin-card">
+  <div class="admin-card__head"><div><h2>已有技能</h2><p><%= skills.length %> 条</p></div></div>
+  <% skills.forEach((skill) => { %>
+    <form method="post" action="/admin/skills/<%= skill.id %>" class="admin-item admin-form">
+      <input type="hidden" name="_csrf" value="<%= csrf %>" />
+      <div class="admin-item__head">
+        <strong><%= skill.title %></strong>
+        <button class="mini-btn mini-btn--danger" type="submit" formaction="/admin/skills/<%= skill.id %>/delete" formmethod="post" data-confirm="确定删除这条技能吗？">删除</button>
+      </div>
+      <div class="form-grid">
+        <label class="field"><span>标题</span><input name="title" value="<%= skill.title %>" required /></label>
+        <label class="field"><span>程度</span><input name="level" value="<%= skill.level %>" /></label>
+        <label class="field field--full"><span>说明</span><textarea name="description" rows="2"><%= skill.description %></textarea></label>
+        <label class="field field--full"><span>标签（逗号分隔）</span><input name="tags" value="<%= skill.tags.join(', ') %>" /></label>
+      </div>
+      <div class="admin-actions"><button class="btn btn--accent admin-small-btn" type="submit">保存这条</button></div>
+    </form>
+  <% }) %>
+</div>
+
+<%- include('partials/bottom') %>

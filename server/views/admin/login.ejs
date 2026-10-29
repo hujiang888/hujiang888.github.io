@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内容后台 · <%= site.name %></title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f6f2e9" />
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/admin-assets/admin.css" />
+  </head>
+  <body class="admin-body admin-login-body">
+    <header class="admin-top">
+      <div class="admin-wrap admin-top__inner">
+        <a class="admin-brand" href="/">
+          <img src="/assets/img/logo.svg" alt="" width="32" height="32" />
+          <span><strong><%= site.name %></strong><small>CONTENT ADMIN</small></span>
+        </a>
+        <a class="admin-link" href="/">返回网站 ↗</a>
+      </div>
+    </header>
+
+    <main class="admin-login">
+      <div class="admin-login__intro">
+        <p class="admin-kicker">ADMIN / MYSQL</p>
+        <h1>内容管理后台</h1>
+        <p>登录后直接修改站点信息、关于、技能、项目和文章。所有内容保存在本机 MySQL 数据库，前台由 Express 实时渲染。</p>
+        <ul>
+          <li><span>01</span>Express + MySQL</li>
+          <li><span>02</span>服务端渲染，刷新即更新</li>
+          <li><span>03</span>内容表：site_settings / skills / projects / posts</li>
+        </ul>
+      </div>
+
+      <div class="admin-login__card">
+        <p class="admin-kicker">SIGN IN</p>
+        <h2>管理员登录</h2>
+        <% if (error) { %>
+          <div class="admin-flash admin-flash--error" role="alert"><%= error %></div>
+        <% } %>
+        <form method="post" action="/admin/login" class="admin-form">
+          <input type="hidden" name="_csrf" value="<%= csrf %>" />
+          <label class="field field--full">
+            <span>用户名</span>
+            <input type="text" name="username" autocomplete="username" required autofocus />
+          </label>
+          <label class="field field--full">
+            <span>密码</span>
+            <input type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <button class="btn btn--accent admin-submit" type="submit">登录后台</button>
+        </form>
+        <p class="admin-login__hint">账号由 <code>ADMIN_USER</code> / <code>ADMIN_PASSWORD</code> 初始化，可在 <code>server/.env</code> 中修改后重新运行 db:setup。</p>
+      </div>
+    </main>
+
+    <footer class="admin-footer">
+      <div class="admin-wrap"><span>Express + MySQL · 本地内容后台</span></div>
+    </footer>
+  </body>
+</html>

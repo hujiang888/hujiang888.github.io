@@ -1,0 +1,39 @@
+<%- include('partials/head', { title: '站点信息' }) %>
+<%- include('partials/top', { active: 'profile', title: '站点信息', subtitle: '首屏、索引卡、页脚与联系区' }) %>
+
+<form method="post" action="/admin/profile" class="admin-form">
+  <input type="hidden" name="_csrf" value="<%= csrf %>" />
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>基本信息</h2><p>会同步到首页首屏与页脚</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span>显示名</span><input name="profile_name" value="<%= site.name %>" required /></label>
+      <label class="field"><span>英文名</span><input name="profile_en" value="<%= site.en %>" /></label>
+      <label class="field"><span>身份</span><input name="role" value="<%= site.role %>" /></label>
+      <label class="field"><span>方向</span><input name="focus" value="<%= site.focus %>" /></label>
+      <label class="field field--full"><span>首屏简介</span><textarea name="lead" rows="4"><%= site.lead %></textarea></label>
+      <label class="field"><span>首屏元信息</span><input name="meta" value="<%= site.meta %>" /></label>
+      <label class="field"><span>开放状态</span><input name="status" value="<%= site.status %>" /></label>
+      <label class="field"><span>坐标</span><input name="location" value="<%= site.location %>" /></label>
+      <label class="field"><span>正在做</span><input name="doing" value="<%= site.doing %>" /></label>
+      <label class="field"><span>最近更新</span><input name="updated" value="<%= site.updated %>" /></label>
+      <label class="field"><span>GitHub 地址</span><input name="github" value="<%= site.github %>" /></label>
+      <label class="field"><span>GitHub 用户名</span><input name="github_name" value="<%= site.githubName %>" /></label>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>联系区</h2><p>首页底部文案</p></div></div>
+    <div class="form-grid">
+      <label class="field field--full"><span>联系区介绍</span><textarea name="contact_intro" rows="3"><%= site.contact.intro %></textarea></label>
+      <label class="field field--full"><span>联系区备注</span><input name="contact_note" value="<%= site.contact.note %>" /></label>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn btn--accent" type="submit">保存站点信息</button>
+    <a class="btn btn--ghost" href="/" target="_blank" rel="noreferrer">预览首页</a>
+  </div>
+</form>
+
+<%- include('partials/bottom') %>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> · <%= site ? site.name : 'Jiang Hu' %></title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+  </head>
+  <body>
+    <main class="error-page">
+      <div>
+        <img src="/assets/img/logo.svg" alt="" width="52" height="52" style="margin: 0 auto 28px; border-radius: 14px" />
+        <p class="section-label" style="justify-content: center"><span>ERROR</span></p>
+        <h1><%= title %></h1>
+        <p><%= message %></p>
+        <a class="btn btn--accent" href="/">返回首页</a>
+      </div>
+    </main>
+  </body>
+</html>

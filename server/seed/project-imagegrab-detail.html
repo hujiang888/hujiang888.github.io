@@ -1,0 +1,75 @@
+<h2 id="background">背景：把图片“干净地”拿下来</h2>
+            <p>
+              电商详情页的图片分散在主图、缩略图、详情长图、懒加载属性和背景图里。
+              逐张右键保存既慢又容易漏，格式还可能是 JPG、WebP、PNG 混在一起。
+              课程需求是做一个浏览器插件，把这些图片集中展示并批量下载为 PNG。
+            </p>
+            <p>
+              我没有把它停在“能抓图”这一层。第一版上线后，最直接的问题不是抓不到，而是抓得太多：
+              推荐商品、买家秀、店铺横幅、二维码都进了画廊。于是有了 v1.1 的相关性过滤返工。
+            </p>
+
+            <h2 id="build">我做了什么</h2>
+            <ul>
+              <li><strong>扩展端</strong>：Manifest V3 + content script，在淘宝、天猫、京东、拼多多详情页注入悬浮按钮。</li>
+              <li><strong>提取核心</strong>：扫描 <code>img</code>、<code>srcset</code>、<code>data-src</code>、<code>background-image</code>、JSON-LD 与 <code>og:image</code>，补全相对路径并去重。</li>
+              <li><strong>相关性过滤</strong>：结合页面区域、商品链接、图片比例与 alt 文案，默认只保留商品主图、详情图和试穿图。</li>
+              <li><strong>画廊</strong>：网格预览、尺寸筛选、全选 / 反选、单张放大，以及「商品图 / 全部」切换。</li>
+              <li><strong>下载</strong>：OffscreenCanvas 转 PNG，逐张进度与结果反馈，文件名按 <code>商品图_001.png</code> 编号。</li>
+              <li><strong>官网与发布</strong>：静态宣传站、安装说明、GitHub Release、GitHub Pages 部署与线上验证。</li>
+            </ul>
+
+            <h2 id="problems">三个关键问题</h2>
+            <h3>1. 下载一直“失败”，其实文件已经下好了</h3>
+            <p>
+              后台等待下载完成时，把 Chrome 的 <code>in_progress</code> 状态误判成了中断，于是不断重试，
+              一次操作产生多份重复文件。修复方式是只认 <code>complete</code> / <code>interrupted</code>
+              两个终态，中间状态不再触发结束。
+            </p>
+
+            <h3>2. 无关图片也进来了</h3>
+            <p>
+              尺寸过滤只能挡住图标和小图，挡不住同样高清的推荐商品和买家秀。最终方案是把图片放回页面结构里：
+              先排除推荐 / 评价 / 广告区域与指向其他商品的链接，再用图片比例、alt 和所在容器判断相关性。
+              默认只显示商品图，但保留「全部」作为可恢复的出口。
+            </p>
+            <p>
+              详细过程写在 <a href="/post/imagegrab-retrospective">这篇复盘</a>里。
+            </p>
+
+            <h3>3. 发布不是 push 就结束</h3>
+            <p>
+              GitHub Pages 首次部署时，Actions 在跑但 Pages 还没启用，结果部署失败；
+              另外用 PowerShell 写中文仓库简介时出现过 <code>???</code> 编码问题。
+              这些都不是“代码 bug”，但会直接影响项目能不能被访问、被理解。
+              解决后我把检查清单固定下来：状态码、资源、移动端、控制台、下载文件，逐项验证。
+            </p>
+
+            <figure>
+              <img src="/assets/img/imagegrab-fab.png" alt="商品详情页右下角的获取图片悬浮按钮" width="780" height="660" loading="lazy">
+              <figcaption>详情页右下角的悬浮按钮，不遮挡原有操作；点击后打开独立画廊。</figcaption>
+            </figure>
+
+            <h2 id="result">结果</h2>
+            <p>
+              在包含真实干扰项的模拟详情页里，扫描到 19 张候选图，默认保留 11 张商品图
+              （含一张模特试穿图），过滤 8 张推荐 / 买家秀 / 广告 / 二维码。
+              11 张商品图全部成功转换为 PNG，其中 1800×1800 的大图约 4.7MB。
+            </p>
+            <p>
+              扩展在模拟的 <code>item.jd.com</code> 详情页上完成了真实 manifest 的自动注入测试；
+              线上官网与下载地址均可访问。需要说明的是，真实淘宝 / 京东页面需要登录且存在反爬，
+              本项目没有做真实账号下的完整人工验证，平台改版后也可能需要更新页面规则。
+            </p>
+
+            <h2 id="links">链接</h2>
+            <div class="project-links-box">
+              <a class="btn btn--accent" href="https://hujiang888.github.io/imagegrab/" target="_blank" rel="noreferrer">线上官网</a>
+              <a class="btn btn--ghost" href="https://github.com/hujiang888/imagegrab" target="_blank" rel="noreferrer">GitHub 仓库</a>
+              <a class="btn btn--ghost" href="https://github.com/hujiang888/imagegrab/releases/tag/v1.1.0" target="_blank" rel="noreferrer">v1.1.0 Release</a>
+            </div>
+
+            
+
+            
+          

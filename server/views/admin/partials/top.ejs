@@ -1,0 +1,41 @@
+<header class="admin-top">
+  <div class="admin-wrap admin-top__inner">
+    <a class="admin-brand" href="/">
+      <img src="/assets/img/logo.svg" alt="" width="32" height="32" />
+      <span><strong><%= site.name %></strong><small>CONTENT ADMIN</small></span>
+    </a>
+    <div class="admin-top__actions">
+      <a class="admin-link" href="/" target="_blank" rel="noreferrer">查看网站 ↗</a>
+      <span class="admin-user"><%= admin.username %></span>
+      <form method="post" action="/admin/logout">
+        <input type="hidden" name="_csrf" value="<%= csrf %>" />
+        <button class="admin-quiet" type="submit">退出</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<div class="admin-shell">
+  <aside class="admin-side">
+    <p class="admin-side__label">内容</p>
+    <a class="<%= active === 'dashboard' ? 'is-active' : '' %>" href="/admin">概览</a>
+    <a class="<%= active === 'profile' ? 'is-active' : '' %>" href="/admin/profile">站点信息</a>
+    <a class="<%= active === 'about' ? 'is-active' : '' %>" href="/admin/about">关于</a>
+    <a class="<%= active === 'skills' ? 'is-active' : '' %>" href="/admin/skills">技能</a>
+    <a class="<%= active === 'projects' ? 'is-active' : '' %>" href="/admin/projects">项目</a>
+    <a class="<%= active === 'posts' ? 'is-active' : '' %>" href="/admin/posts">文章</a>
+    <p class="admin-side__note">Express · MySQL</p>
+    <div class="admin-side__foot">
+      <a href="/" target="_blank" rel="noreferrer">返回前台 ↗</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-page-head">
+      <div>
+        <p class="admin-kicker">ADMIN / CONTENT</p>
+        <h1><%= title %></h1>
+        <p><%= subtitle %></p>
+      </div>
+    </div>
+    <%- include('flash') %>

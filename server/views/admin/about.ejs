@@ -1,0 +1,30 @@
+<%- include('partials/head', { title: '关于' }) %>
+<%- include('partials/top', { active: 'about', title: '关于', subtitle: '正文、原则、NOW 与时间线' }) %>
+
+<form method="post" action="/admin/about" class="admin-form">
+  <input type="hidden" name="_csrf" value="<%= csrf %>" />
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>正文</h2><p>空行分段</p></div></div>
+    <div class="form-grid">
+      <label class="field field--full"><span>开头一句</span><textarea name="about_intro" rows="2"><%= site.about.intro %></textarea></label>
+      <label class="field field--full"><span>正文段落</span><textarea name="about_paragraphs" rows="10"><%= site.about.paragraphs.join('\n\n') %></textarea></label>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>侧栏</h2><p>每行一条；时间线格式：日期 | 标题 | 说明</p></div></div>
+    <div class="form-grid">
+      <label class="field"><span>做事原则</span><textarea name="about_values" rows="4"><%= site.about.values.join('\n') %></textarea></label>
+      <label class="field"><span>NOW 清单</span><textarea name="about_now" rows="4"><%= site.about.now.join('\n') %></textarea></label>
+      <label class="field field--full"><span>时间线</span><textarea name="about_timeline" rows="8"><%= site.about.timeline.map((item) => `${item.date} | ${item.title} | ${item.desc}`).join('\n') %></textarea></label>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn btn--accent" type="submit">保存关于内容</button>
+    <a class="btn btn--ghost" href="/#about" target="_blank" rel="noreferrer">预览关于区</a>
+  </div>
+</form>
+
+<%- include('partials/bottom') %>

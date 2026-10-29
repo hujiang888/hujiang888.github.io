@@ -1,0 +1,31 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/top', { active: 'posts', title: title, subtitle: subtitle }) %>
+
+<form method="post" action="<%= post.id ? '/admin/posts/' + post.id : '/admin/posts' %>" class="admin-form">
+  <input type="hidden" name="_csrf" value="<%= csrf %>" />
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>文章信息</h2><p>slug 决定前台 URL</p></div></div>
+    <div class="form-grid">
+      <label class="field field--full"><span>标题</span><input name="title" value="<%= post.title %>" required /></label>
+      <label class="field"><span>Slug</span><input name="slug" value="<%= post.slug %>" required pattern="[A-Za-z0-9\-]+" /></label>
+      <label class="field"><span>日期</span><input name="date_text" value="<%= post.date_text %>" placeholder="2026.10.29" /></label>
+      <label class="field"><span>阅读时间</span><input name="read_time" value="<%= post.read_time %>" /></label>
+      <label class="field"><span>分类</span><input name="category" value="<%= post.category %>" /></label>
+      <label class="field field--full"><span>摘要</span><textarea name="excerpt" rows="3"><%= post.excerpt %></textarea></label>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card__head"><div><h2>正文 HTML</h2><p>支持 h2 / h3 / p / ul / pre / code / blockquote</p></div></div>
+    <textarea class="admin-editor" name="content_html" rows="24"><%= post.content_html %></textarea>
+  </div>
+
+  <div class="admin-actions">
+    <button class="btn btn--accent" type="submit">保存文章</button>
+    <% if (post.id) { %><a class="btn btn--ghost" href="/post/<%= post.slug %>" target="_blank" rel="noreferrer">预览文章</a><% } %>
+    <a class="btn btn--ghost" href="/admin/posts">返回列表</a>
+  </div>
+</form>
+
+<%- include('partials/bottom') %>
