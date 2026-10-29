@@ -216,6 +216,7 @@
     state.dirty = false;
     dashboard.hidden = true;
     loginView.hidden = false;
+    tokenInput.value = '';
     $('#logoutBtn').hidden = true;
     setStatus(loginStatus, '已退出。');
   }
@@ -338,6 +339,7 @@
           </div>
           <div class="admin-grid">
             ${field('标题', 'projects', 'title', project.title, { index })}
+            ${field('Slug（数据标识）', 'projects', 'slug', project.slug, { index })}
             ${field('副标题', 'projects', 'subtitle', project.subtitle, { index })}
             ${field('Kicker（年份 · 类型）', 'projects', 'kicker', project.kicker, { index })}
             ${field('封面图路径（可选）', 'projects', 'cover', project.cover, { index })}
@@ -348,7 +350,7 @@
             ${field('源码链接', 'projects', 'repo', (project.links || {}).repo, { index })}
             ${field('详情链接', 'projects', 'detail', (project.links || {}).detail, { index, full: true })}
             ${field('卡片封面样式（llm / site）', 'projects', 'coverClass', project.coverClass, { index })}
-            ${field('封面大字', 'projects', 'coverWord', project.coverWord, { index })}
+            ${field('封面大字（可换行）', 'projects', 'coverWord', project.coverWord, { index, rows: 2 })}
             ${field('封面备注', 'projects', 'coverNote', project.coverNote, { index })}
             ${field('封面 alt', 'projects', 'coverAlt', project.coverAlt, { index, full: true })}
             ${checkField('设为首屏精选项目', 'projects', 'featured', Boolean(project.featured), index)}
